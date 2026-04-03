@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "framework": "nextjs",
+  "functions": {
+    "src/app/**/*": {
+      "maxDuration": 60
+    }
+  },
+  "installCommand": "npm install",
+  "buildCommand": "npm run build"
+}
