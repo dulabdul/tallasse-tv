@@ -1,4 +1,4 @@
-import type { CollectionConfig, FieldHook } from 'payload'
+import type { CollectionConfig, FieldHook, Where } from 'payload'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 
 /**
@@ -57,7 +57,7 @@ export const Articles: CollectionConfig = {
     },
   },
   access: {
-    read: ({ req }) => {
+    read: ({ req }): boolean | Where => {
       // Published articles are public; drafts need auth
       if (req.user) return true
       return {

@@ -5,12 +5,12 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { s3Storage } from '@payloadcms/storage-s3'
 
-import { Media } from './collections/Media'
-import { Authors } from './collections/Authors'
-import { Categories } from './collections/Categories'
-import { Articles } from './collections/Articles'
-import { Users } from './collections/Users'
-import { SiteSettings } from './globals/SiteSettings'
+import { Media } from './collections/Media.js'
+import { Authors } from './collections/Authors.js'
+import { Categories } from './collections/Categories.js'
+import { Articles } from './collections/Articles.js'
+import { Users } from './collections/Users.js'
+import { SiteSettings } from './globals/SiteSettings.js'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -21,8 +21,6 @@ export default buildConfig({
     user: 'users',
     meta: {
       titleSuffix: '— TallasseeTV CMS',
-      favicon: '/favicon.ico',
-      ogImage: '/og-image.jpg',
     },
     components: {
       graphics: {

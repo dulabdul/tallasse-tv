@@ -1,13 +1,12 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "ignoreDeprecations": "5.0",
     "lib": [
       "ES2022",
       "DOM"
     ],
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "target": "ES2022",
     "strict": true,
     "esModuleInterop": true,
@@ -33,7 +32,8 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "next-env.d.ts"
   ],
   "exclude": [
     "node_modules",
