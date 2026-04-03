@@ -1,0 +1,125 @@
+---
+/**
+ * BaseLayout — Master layout wrapping every page
+ */
+import Header from '@/components/layout/Header.astro';
+import Footer from '@/components/layout/Footer.astro';
+import SEO from '@/components/seo/SEO.astro';
+import JsonLd from '@/components/seo/JsonLd.astro';
+import '@/styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  imageAlt?: string;
+  canonicalUrl?: string;
+  type?: 'website' | 'article';
+  publishedAt?: string;
+  updatedAt?: string;
+  author?: string;
+  noIndex?: boolean;
+  siteName?: string;
+  jsonLd?: {
+    type: 'article' | 'website' | 'breadcrumb' | 'person';
+    data: Record<string, any>;
+    breadcrumbs?: Array<{ name: string; url: string }>;
+  };
+  class?: string;
+}
+
+const {
+  title,
+  description,
+  image,
+  imageAlt,
+  canonicalUrl,
+  type = 'website',
+  publishedAt,
+  updatedAt,
+  author,
+  noIndex,
+  siteName,
+  jsonLd,
+  class: className,
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Google Fonts: Outfit & Inter -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Theme color — Neutral Dark -->
+    <meta name="theme-color" content="#0f172a" />
+
+    <!-- SEO -->
+    <SEO
+      title={title}
+      description={description}
+      image={image}
+      imageAlt={imageAlt}
+      url={Astro.url.href}
+      canonicalUrl={canonicalUrl}
+      type={type}
+      publishedAt={publishedAt}
+      updatedAt={updatedAt}
+      author={author}
+      noIndex={noIndex}
+      siteName={siteName}
+    />
+
+    <!-- JSON-LD -->
+    {jsonLd && (
+      <JsonLd
+        type={jsonLd.type}
+        data={jsonLd.data}
+        breadcrumbs={jsonLd.breadcrumbs}
+      />
+    )}
+
+    <!-- Website JSON-LD (every page) -->
+    <JsonLd type="website" data={{}} />
+
+    <!-- Early theme script (prevents FOUC) -->
+    <script is:inline>
+      (function() {
+        const stored = localStorage.getItem('theme');
+        const preferred = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', stored || preferred);
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- Skip to content for accessibility -->
+    <a href="#main-content" class="skip-to-content">Langsung ke konten</a>
+
+    <!-- Header -->
+    <Header />
+
+    <!-- Main Content -->
+    <main id="main-content" class={className} tabindex="-1">
+      <slot />
+    </main>
+
+    <!-- Footer -->
+    <Footer />
+  </body>
+</html>

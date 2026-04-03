@@ -1,0 +1,130 @@
+---
+/**
+ * JSON-LD Structured Data — Schema.org
+ * Supports: Article, BreadcrumbList, Person (Author), WebSite
+ */
+interface BreadcrumbItem {
+  name: string;
+  url: string;
+}
+
+interface Props {
+  type: 'article' | 'breadcrumb' | 'website' | 'person';
+  data: Record<string, any>;
+  breadcrumbs?: BreadcrumbItem[];
+}
+
+const { type, data, breadcrumbs } = Astro.props;
+const siteUrl = import.meta.env.PUBLIC_SITE_URL || 'https://tallasseetv.com';
+
+function buildArticleSchema(d: Record<string, any>) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: d.title,
+    description: d.description,
+    image: d.image,
+    datePublished: d.publishedAt,
+    dateModified: d.updatedAt || d.publishedAt,
+    url: d.url,
+    inLanguage: 'id-ID',
+    isPartOf: {
+      '@type': 'Blog',
+      name: 'TallasseeTV',
+      url: siteUrl,
+    },
+    author: {
+      '@type': 'Person',
+      name: d.authorName,
+      url: d.authorUrl || siteUrl,
+      ...(d.authorImage ? { image: d.authorImage } : {}),
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'TallasseeTV',
+      url: siteUrl,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/images/logo.png`,
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': d.url,
+    },
+    ...(d.readingTime
+      ? { timeRequired: `PT${d.readingTime}M` }
+      : {}),
+    ...(d.categories?.length
+      ? { articleSection: d.categories[0] }
+      : {}),
+    ...(d.keywords?.length
+      ? { keywords: d.keywords.join(', ') }
+      : {}),
+  };
+}
+
+function buildBreadcrumbSchema(items: BreadcrumbItem[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: item.url,
+    })),
+  };
+}
+
+function buildWebsiteSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'TallasseeTV',
+    url: siteUrl,
+    description: 'TallasseeTV — Menyajikan berita dan informasi terkini yang akurat dan terpercaya.',
+    inLanguage: 'id-ID',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${siteUrl}/cari?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  };
+}
+
+function buildPersonSchema(d: Record<string, any>) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: d.name,
+    description: d.bio,
+    url: d.url || siteUrl,
+    ...(d.image ? { image: d.image } : {}),
+    ...(d.sameAs?.length ? { sameAs: d.sameAs } : {}),
+  };
+}
+
+// Build schemas array (may include multiple JSON-LD blocks)
+const schemas: object[] = [];
+
+if (type === 'article') {
+  schemas.push(buildArticleSchema(data));
+}
+if (type === 'website') {
+  schemas.push(buildWebsiteSchema());
+}
+if (type === 'person') {
+  schemas.push(buildPersonSchema(data));
+}
+if (breadcrumbs?.length) {
+  schemas.push(buildBreadcrumbSchema(breadcrumbs));
+}
+---
+
+{schemas.map((schema) => (
+  <script type="application/ld+json" set:html={JSON.stringify(schema, null, 0)} />
+))}

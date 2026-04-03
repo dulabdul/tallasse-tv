@@ -1,0 +1,426 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import { getSiteSettings } from '@/lib/payload';
+
+const settings = await getSiteSettings().catch(() => null);
+const email = settings?.contact?.email || 'redaksi@tallasseetv.com';
+const phone = settings?.contact?.phone || null;
+
+const faqs = [
+  {
+    q: 'Bagaimana cara mengirim artikel atau liputan ke TallasseeTV?',
+    a: 'Anda dapat mengirimkan artikel atau liputan melalui email redaksi kami. Pastikan mencantumkan nama lengkap, asal instansi (jika ada), dan deskripsi singkat tentang topik yang ingin disampaikan.',
+  },
+  {
+    q: 'Berapa lama waktu respons untuk pesan yang dikirim?',
+    a: 'Kami berusaha merespons setiap pesan dalam waktu 1-3 hari kerja. Untuk urusan mendesak, silakan hubungi kami melalui nomor WhatsApp yang tersedia.',
+  },
+  {
+    q: 'Apakah TallasseeTV menerima kerja sama atau sponsorship?',
+    a: 'Ya, kami terbuka untuk berbagai bentuk kerja sama yang sesuai dengan nilai-nilai redaksi kami. Silakan hubungi kami melalui email untuk diskusi lebih lanjut.',
+  },
+];
+---
+
+<BaseLayout
+  title="Kontak"
+  description="Hubungi tim TallasseeTV. Kami siap melayani pertanyaan, masukan, atau permintaan kerja sama Anda."
+  type="website"
+>
+  <div class="container page-wrapper">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ol role="list">
+        <li><a href="/">Beranda</a></li>
+        <li aria-hidden="true">›</li>
+        <li><span aria-current="page">Kontak</span></li>
+      </ol>
+    </nav>
+
+    <header class="page-header animate-fade-in-up">
+      <h1 class="page-title">Hubungi Kami</h1>
+      <p class="page-desc">
+        Kami senang mendengar dari Anda. Kirimkan pertanyaan, masukan, atau informasi berita kepada kami.
+      </p>
+    </header>
+
+    <div class="contact-layout">
+      <!-- Contact Info -->
+      <aside class="contact-info animate-fade-in-up animation-delay-100" aria-label="Informasi kontak">
+        <h2 class="info-heading">Informasi Kontak</h2>
+
+        <div class="info-cards">
+          <div class="info-card">
+            <div class="info-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+              </svg>
+            </div>
+            <div>
+              <span class="info-label">Email Redaksi</span>
+              <a href={`mailto:${email}`} class="info-value">{email}</a>
+            </div>
+          </div>
+
+          {phone && (
+            <div class="info-card">
+              <div class="info-icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13 19.79 19.79 0 0 1 1.6 4.35 2 2 0 0 1 3.57 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.18 6.18l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+              </div>
+              <div>
+                <span class="info-label">WhatsApp / Telepon</span>
+                <a href={`tel:${phone}`} class="info-value">{phone}</a>
+              </div>
+            </div>
+          )}
+
+          <div class="info-card">
+            <div class="info-icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div>
+              <span class="info-label">Jam Operasional</span>
+              <span class="info-value">Senin–Jumat, 08.00–17.00 WIB</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Social media -->
+        {settings?.socialLinks && settings.socialLinks.length > 0 && (
+          <div class="social-section" aria-label="Media sosial kami">
+            <h3 class="social-heading">Temukan Kami Di</h3>
+            <div class="social-list">
+              {settings.socialLinks.map(link => (
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="social-item"
+                  aria-label={`TallasseeTV di ${link.platform}`}
+                >
+                  <span class="social-platform">{link.platform}</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/>
+                  </svg>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+      </aside>
+
+      <!-- Contact Form -->
+      <section class="contact-form-section animate-fade-in-up animation-delay-200" aria-labelledby="form-heading">
+        <h2 id="form-heading" class="form-heading">Kirim Pesan</h2>
+
+        <form
+          id="contact-form"
+          class="contact-form"
+          novalidate
+          aria-label="Formulir kontak"
+        >
+          <div class="form-row">
+            <div class="form-group">
+              <label for="contact-name" class="form-label">
+                Nama Lengkap <span class="required" aria-hidden="true">*</span>
+              </label>
+              <input
+                id="contact-name"
+                name="name"
+                type="text"
+                class="form-input"
+                placeholder="Masukkan nama Anda"
+                required
+                autocomplete="name"
+                aria-required="true"
+              />
+            </div>
+            <div class="form-group">
+              <label for="contact-email" class="form-label">
+                Alamat Email <span class="required" aria-hidden="true">*</span>
+              </label>
+              <input
+                id="contact-email"
+                name="email"
+                type="email"
+                class="form-input"
+                placeholder="email@contoh.com"
+                required
+                autocomplete="email"
+                aria-required="true"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="contact-subject" class="form-label">Subjek</label>
+            <select id="contact-subject" name="subject" class="form-input form-select">
+              <option value="">Pilih topik pesan...</option>
+              <option value="pertanyaan">Pertanyaan Umum</option>
+              <option value="koreksi">Koreksi Berita</option>
+              <option value="kerjasama">Kerja Sama / Sponsorship</option>
+              <option value="liputan">Kiriman Liputan / Artikel</option>
+              <option value="teknis">Masalah Teknis</option>
+              <option value="lainnya">Lainnya</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="contact-message" class="form-label">
+              Pesan <span class="required" aria-hidden="true">*</span>
+            </label>
+            <textarea
+              id="contact-message"
+              name="message"
+              class="form-input form-textarea"
+              placeholder="Tulis pesan Anda di sini..."
+              rows="6"
+              required
+              aria-required="true"
+            ></textarea>
+          </div>
+
+          <div id="form-alert" class="form-alert" role="alert" aria-live="polite" hidden></div>
+
+          <button type="submit" id="submit-btn" class="btn btn-primary submit-btn">
+            <span id="btn-text">Kirim Pesan</span>
+            <svg id="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </button>
+        </form>
+      </section>
+    </div>
+
+    <!-- FAQ -->
+    <section class="faq-section animate-fade-in-up animation-delay-300" aria-labelledby="faq-heading">
+      <h2 id="faq-heading" class="section-title">Pertanyaan yang Sering Diajukan</h2>
+      <div class="faq-list">
+        {faqs.map((faq, i) => (
+          <details class="faq-item" name="faq-group">
+            <summary class="faq-question" aria-expanded="false">
+              <span>{faq.q}</span>
+              <svg class="faq-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </summary>
+            <p class="faq-answer">{faq.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .page-wrapper { padding: 2.5rem 0 5rem; }
+
+  .breadcrumb ol {
+    display: flex; align-items: center; gap: 0.5rem;
+    list-style: none; padding: 0; margin: 0 0 1.5rem; font-size: 0.875rem;
+  }
+  .breadcrumb a { color: var(--color-text-tertiary); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--color-accent); }
+  .breadcrumb span { color: var(--color-text-secondary); font-weight: 500; }
+
+  .page-header { margin-bottom: 2.5rem; }
+  .page-title {
+    font-size: clamp(2rem, 5vw, 3rem); font-weight: 800;
+    letter-spacing: -0.03em; color: var(--color-text-primary); margin-bottom: 0.625rem;
+  }
+  .page-desc { font-size: 1.0625rem; color: var(--color-text-secondary); max-width: 520px; }
+
+  /* Layout */
+  .contact-layout {
+    display: grid; grid-template-columns: 1fr; gap: 2.5rem; margin-bottom: 3.5rem;
+  }
+  @media (min-width: 1024px) {
+    .contact-layout { grid-template-columns: 340px 1fr; }
+  }
+
+  /* Info */
+  .info-heading, .form-heading {
+    font-size: 1.125rem; font-weight: 700; color: var(--color-text-primary); margin-bottom: 1.25rem;
+  }
+
+  .info-cards { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.75rem; }
+
+  .info-card {
+    display: flex; align-items: flex-start; gap: 0.875rem;
+    padding: 1.125rem; background: var(--color-surface);
+    border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  }
+
+  .info-icon {
+    width: 42px; height: 42px; border-radius: var(--radius-md);
+    background: var(--color-accent-bg); color: var(--color-accent);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+
+  .info-label {
+    display: block; font-size: 0.75rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.07em; color: var(--color-text-tertiary); margin-bottom: 0.2rem;
+  }
+
+  .info-value {
+    font-size: 0.9375rem; color: var(--color-text-primary); font-weight: 500;
+    text-decoration: none; transition: color var(--timing);
+  }
+
+  a.info-value:hover { color: var(--color-accent); }
+
+  .social-heading {
+    font-size: 0.8125rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--color-text-tertiary); margin-bottom: 0.75rem;
+  }
+
+  .social-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+  .social-item {
+    display: inline-flex; align-items: center; gap: 0.375rem;
+    padding: 0.4rem 0.875rem; font-size: 0.875rem; font-weight: 500;
+    color: var(--color-text-secondary); background: var(--color-surface);
+    border: 1px solid var(--color-border); border-radius: var(--radius-full);
+    text-decoration: none; text-transform: capitalize; transition: all var(--timing);
+  }
+
+  .social-item:hover {
+    background: var(--color-accent); border-color: var(--color-accent); color: white;
+  }
+
+  /* Form */
+  .contact-form-section {
+    background: var(--color-surface); border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl); padding: 2rem;
+  }
+
+  .contact-form { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  .form-row { display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+  @media (min-width: 580px) { .form-row { grid-template-columns: repeat(2, 1fr); } }
+
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+
+  .form-label {
+    font-size: 0.875rem; font-weight: 500; color: var(--color-text-secondary);
+  }
+
+  .required { color: var(--color-error); }
+
+  .form-input {
+    width: 100%; padding: 0.625rem 0.875rem;
+    font-size: 0.9375rem; font-family: var(--font-sans);
+    background: var(--color-bg-secondary); color: var(--color-text-primary);
+    border: 1px solid var(--color-border); border-radius: var(--radius-md);
+    transition: all var(--timing); outline: none;
+  }
+
+  .form-input:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 15%, transparent);
+    background: var(--color-bg);
+  }
+
+  .form-input::placeholder { color: var(--color-text-tertiary); }
+  .form-select { cursor: pointer; }
+  .form-textarea { resize: vertical; min-height: 140px; line-height: 1.6; }
+
+  .form-alert {
+    padding: 0.875rem 1rem; border-radius: var(--radius-md);
+    font-size: 0.9375rem; font-weight: 500;
+  }
+
+  .form-alert.success {
+    background: color-mix(in srgb, var(--color-success) 12%, transparent);
+    color: var(--color-success);
+    border: 1px solid color-mix(in srgb, var(--color-success) 30%, transparent);
+  }
+
+  .form-alert.error {
+    background: color-mix(in srgb, var(--color-error) 12%, transparent);
+    color: var(--color-error);
+    border: 1px solid color-mix(in srgb, var(--color-error) 30%, transparent);
+  }
+
+  .submit-btn { align-self: flex-start; padding: 0.75rem 1.75rem; font-size: 1rem; }
+  .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+  /* FAQ */
+  .faq-section { margin-top: 1rem; }
+  .faq-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+  .faq-item {
+    background: var(--color-surface); border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg); overflow: hidden; transition: border-color var(--timing);
+  }
+
+  .faq-item[open] { border-color: var(--color-accent); }
+
+  .faq-question {
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding: 1.125rem 1.25rem;
+    font-size: 1rem; font-weight: 600; color: var(--color-text-primary);
+    cursor: pointer; list-style: none; transition: color var(--timing);
+  }
+
+  .faq-question:hover { color: var(--color-accent); }
+  .faq-question::-webkit-details-marker { display: none; }
+
+  .faq-icon {
+    flex-shrink: 0; transition: transform 0.25s ease;
+    color: var(--color-text-tertiary);
+  }
+
+  .faq-item[open] .faq-icon { transform: rotate(180deg); color: var(--color-accent); }
+
+  .faq-answer {
+    padding: 0 1.25rem 1.25rem;
+    font-size: 0.9375rem; color: var(--color-text-secondary); line-height: 1.7; margin: 0;
+  }
+</style>
+
+<script>
+  // Basic form handling (replace with actual API endpoint in production)
+  const form = document.getElementById('contact-form') as HTMLFormElement;
+  const alert = document.getElementById('form-alert') as HTMLDivElement;
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+  const btnText = document.getElementById('btn-text') as HTMLSpanElement;
+
+  function showAlert(message: string, type: 'success' | 'error') {
+    alert.textContent = message;
+    alert.className = `form-alert ${type}`;
+    alert.hidden = false;
+    alert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const name = data.get('name')?.toString().trim();
+    const email = data.get('email')?.toString().trim();
+    const message = data.get('message')?.toString().trim();
+
+    if (!name || !email || !message) {
+      showAlert('Mohon lengkapi semua kolom yang wajib diisi (*).', 'error');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    btnText.textContent = 'Mengirim...';
+
+    try {
+      // Replace with your API endpoint
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      showAlert('✓ Pesan Anda berhasil dikirim! Kami akan merespons dalam 1-3 hari kerja.', 'success');
+      form.reset();
+    } catch {
+      showAlert('Terjadi kesalahan. Silakan kirim email langsung ke redaksi@tallasseetv.com', 'error');
+    } finally {
+      submitBtn.disabled = false;
+      btnText.textContent = 'Kirim Pesan';
+    }
+  });
+</script>

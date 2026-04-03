@@ -1,0 +1,189 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import ArticleCard from '@/components/article/ArticleCard.astro';
+import Pagination from '@/components/ui/Pagination.astro';
+import { getArticles, getCategories } from '@/lib/payload';
+
+const LIMIT = 9;
+const page = Number(Astro.url.searchParams.get('halaman') || '1');
+
+const [articlesData, categories] = await Promise.all([
+  getArticles({ page, limit: LIMIT }),
+  getCategories(),
+]);
+
+const { docs: articles, totalPages, totalDocs } = articlesData;
+
+const breadcrumbs = [
+  { name: 'Beranda', url: import.meta.env.PUBLIC_SITE_URL || 'https://tallasseetv.com' },
+  { name: 'Semua Artikel', url: `${import.meta.env.PUBLIC_SITE_URL || 'https://tallasseetv.com'}/artikel` },
+];
+---
+
+<BaseLayout
+  title={`Semua Artikel${page > 1 ? ` — Halaman ${page}` : ''}`}
+  description="Kumpulan artikel berita dan informasi terkini dari TallasseeTV. Temukan artikel terbaru seputar berbagai topik."
+  type="website"
+  jsonLd={{ type: 'breadcrumb', data: {}, breadcrumbs }}
+>
+  <div class="container page-wrapper">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-nav animate-fade-in" aria-label="Breadcrumb">
+      <ol class="flex items-center gap-2 text-sm font-medium">
+        <li><a href="/" class="hover:text-accent-blue transition-colors">Beranda</a></li>
+        <li class="text-tertiary">/</li>
+        <li class="text-primary font-bold">Semua Artikel</li>
+      </ol>
+    </nav>
+
+    <!-- Header -->
+    <header class="page-header animate-fade-in-up">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="badge badge-accent">Arsip</span>
+        <span class="text-sm font-semibold text-tertiary">{totalDocs} Artikel ditemukan</span>
+      </div>
+      <h1 class="page-title text-5xl font-extrabold tracking-tight mb-4">
+        Jelajahi <span class="text-gradient">Wawasan Kita.</span>
+      </h1>
+      <p class="page-desc text-secondary text-lg max-width-2xl">
+        Kumpulan kurasi berita, opini, dan analisis mendalam dari berbagai kategori pilihan redaksi TallasseeTV.
+      </p>
+    </header>
+
+    <!-- Category filters -->
+    {categories.length > 0 && (
+      <div class="filter-wrapper animate-fade-in-up animation-delay-100">
+        <div class="filter-scroll">
+          <a
+            href="/artikel"
+            class={`filter-pill ${!Astro.url.searchParams.has('kategori') ? 'filter-pill--active' : ''}`}
+          >
+            Semua Topik
+          </a>
+          {categories.map(cat => (
+            <a
+              href={`/kategori/${cat.slug}`}
+              class="filter-pill"
+            >
+              {cat.name}
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <!-- Articles Grid -->
+    {articles.length > 0 ? (
+      <div class="articles-grid mt-12">
+        {articles.map((article, i) => (
+          <div
+            class={`animate-fade-in-up animation-delay-${Math.min((i % 3 + 1) * 100, 300)}`}
+          >
+            <ArticleCard article={article} />
+          </div>
+        ))}
+      </div>
+
+      <div class="mt-20">
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          baseUrl="/artikel"
+        />
+      </div>
+    ) : (
+      <div class="empty-state animate-fade-in">
+        <div class="empty-icon">📭</div>
+        <h2 class="empty-title">Belum Ada Artikel</h2>
+        <p class="empty-desc">Artikel sedang dalam persiapan. Kunjungi kembali nanti.</p>
+        <a href="/" class="btn btn-primary mt-4">Kembali ke Beranda</a>
+      </div>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .page-wrapper {
+    padding-top: 5rem;
+    padding-bottom: 8rem;
+  }
+
+  .breadcrumb-nav {
+    margin-bottom: 3rem;
+  }
+
+  .page-header {
+    margin-bottom: 4rem;
+  }
+
+  .page-title {
+    line-height: 1.1;
+  }
+
+  /* Filter Styling */
+  .filter-wrapper {
+    margin-bottom: 3rem;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .filter-scroll {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .filter-scroll::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+
+  .filter-pill {
+    padding: 0.625rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    white-space: nowrap;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    transition: all var(--timing);
+    background: var(--color-bg);
+  }
+
+  .filter-pill:hover {
+    border-color: var(--color-text-primary);
+    color: var(--color-text-primary);
+    transform: translateY(-2px);
+  }
+
+  .filter-pill--active {
+    background: var(--color-text-primary);
+    color: var(--color-bg);
+    border-color: var(--color-text-primary);
+  }
+
+  /* Grid */
+  .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 2.5rem 2rem;
+  }
+
+  @media (min-width: 768px) {
+    .articles-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (min-width: 1024px) {
+    .articles-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 8rem 0;
+  }
+
+  .empty-icon { font-size: 4rem; margin-bottom: 1.5rem; }
+  .empty-title { font-size: 2rem; font-weight: 800; margin-bottom: 1rem; }
+  .empty-desc { color: var(--color-text-secondary); margin-bottom: 2rem; }
+</style>

@@ -1,0 +1,477 @@
+---
+import BaseLayout from '@/components/layout/BaseLayout.astro';
+import TOC from '@/components/article/TOC.astro';
+import RelatedArticles from '@/components/article/RelatedArticles.astro';
+import SocialShare from '@/components/ui/SocialShare.astro';
+import {
+  getArticleBySlug,
+  getAllArticleSlugs,
+  getMediaUrl,
+} from '@/lib/payload';
+import { blocksToHtml, extractHeadings, formatDate, formatReadingTime, truncate } from '@/lib/utils';
+
+// ── Static Path Generation ─────────────────────────────────────────────────────
+export async function getStaticPaths() {
+  const slugs = await getAllArticleSlugs();
+  return slugs.map(slug => ({ params: { slug } }));
+}
+
+// ── Data Fetching ──────────────────────────────────────────────────────────────
+const { slug } = Astro.params;
+const article = await getArticleBySlug(slug as string);
+
+if (!article) {
+  return Astro.redirect('/404');
+}
+
+// Derived data
+const siteUrl = import.meta.env.PUBLIC_SITE_URL || 'https://tallasseetv.com';
+const articleUrl = `${siteUrl}/artikel/${article.slug}`;
+const featuredImageUrl = getMediaUrl(article.featuredImage, 'hero');
+const ogImageUrl = getMediaUrl(article.seo?.ogImage || article.featuredImage, 'hero');
+const authorImageUrl = article.author?.profilePicture
+  ? getMediaUrl(article.author.profilePicture, 'thumbnail')
+  : undefined;
+
+const seoTitle = article.seo?.title || article.title;
+const seoDesc = article.seo?.description || article.excerpt || truncate(article.title, 160);
+const publishDate = article.publishedAt || article.createdAt;
+const categoryIds = (article.categories || []).map(c => c.id);
+
+// Rich text → HTML
+const contentHtml = blocksToHtml(article.content);
+
+// Table of Contents
+const headings = extractHeadings(article.content);
+
+// JSON-LD data
+const jsonLdData = {
+  title: seoTitle,
+  description: seoDesc,
+  image: ogImageUrl,
+  url: articleUrl,
+  publishedAt: new Date(publishDate).toISOString(),
+  updatedAt: new Date(article.updatedAt).toISOString(),
+  authorName: article.author?.name || 'Redaksi',
+  authorImage: authorImageUrl,
+  readingTime: article.readingTime,
+  categories: (article.categories || []).map(c => c.name),
+};
+
+const breadcrumbs = [
+  { name: 'Beranda', url: siteUrl },
+  { name: 'Artikel', url: `${siteUrl}/artikel` },
+  ...(article.categories?.[0]
+    ? [{ name: article.categories[0].name, url: `${siteUrl}/kategori/${article.categories[0].slug}` }]
+    : []),
+  { name: article.title, url: articleUrl },
+];
+---
+
+<BaseLayout
+  title={seoTitle}
+  description={seoDesc}
+  image={ogImageUrl}
+  imageAlt={article.featuredImage?.alt || article.title}
+  canonicalUrl={article.seo?.canonicalUrl || articleUrl}
+  type="article"
+  publishedAt={new Date(publishDate).toISOString()}
+  updatedAt={new Date(article.updatedAt).toISOString()}
+  author={article.author?.name}
+  noIndex={article.seo?.noIndex}
+  jsonLd={{ type: 'article', data: jsonLdData, breadcrumbs }}
+>
+  <div class="article-page">
+    <div class="container">
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <ol role="list">
+          <li><a href="/">Beranda</a></li>
+          <li aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></li>
+          <li><a href="/artikel">Artikel</a></li>
+          {article.categories?.[0] && (
+            <>
+              <li aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></li>
+              <li><a href={`/kategori/${article.categories[0].slug}`}>{article.categories[0].name}</a></li>
+            </>
+          )}
+          <li aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></li>
+          <li><span aria-current="page">{article.title}</span></li>
+        </ol>
+      </nav>
+
+      <div class="article-layout">
+        <!-- ── Main Content ───────────────────────────────── -->
+        <div class="article-main">
+          <!-- Header -->
+          <header class="article-header animate-fade-in-up">
+            <!-- Categories -->
+            {article.categories && article.categories.length > 0 && (
+              <div class="article-cats" aria-label="Kategori Artikel">
+                {article.categories.map(cat => (
+                  <a href={`/kategori/${cat.slug}`} class="badge badge-accent">
+                    {cat.name}
+                  </a>
+                ))}
+              </div>
+            )}
+
+            <!-- Title -->
+            <h1 class="article-title">{article.title}</h1>
+
+            {article.excerpt && (
+              <p class="article-excerpt">{article.excerpt}</p>
+            )}
+
+            <!-- Meta bar -->
+            <div class="article-meta-bar" role="contentinfo" aria-label="Informasi artikel">
+              <!-- Author -->
+              <div class="article-author" aria-label={`Penulis: ${article.author?.name}`}>
+                {article.author?.profilePicture ? (
+                  <img
+                    src={authorImageUrl}
+                    alt={article.author.name}
+                    class="author-avatar"
+                    width="40"
+                    height="40"
+                    loading="eager"
+                  />
+                ) : (
+                  <div class="author-avatar author-avatar-placeholder" aria-hidden="true">
+                    {article.author?.name?.charAt(0) || 'R'}
+                  </div>
+                )}
+                <div class="author-info">
+                  <span class="author-name">{article.author?.name || 'Redaksi'}</span>
+                  <span class="author-label">Penulis</span>
+                </div>
+              </div>
+
+              <div class="meta-right">
+                <!-- Published date -->
+                <div class="meta-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                  </svg>
+                  <time datetime={new Date(publishDate).toISOString()}>
+                    {formatDate(publishDate)}
+                  </time>
+                </div>
+
+                <!-- Reading time -->
+                {article.readingTime && (
+                  <div class="meta-item" aria-label={`Estimasi waktu baca: ${formatReadingTime(article.readingTime)}`}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    {formatReadingTime(article.readingTime)}
+                  </div>
+                )}
+              </div>
+            </div>
+          </header>
+
+          <!-- Featured Image -->
+          <figure class="article-featured-img animate-fade-in animation-delay-100">
+            <img
+              src={featuredImageUrl}
+              alt={article.featuredImage?.alt || article.title}
+              class="featured-img"
+              width="1200"
+              height="630"
+              loading="eager"
+              decoding="async"
+            />
+            {article.featuredImage?.caption && (
+              <figcaption class="img-caption">{article.featuredImage.caption}</figcaption>
+            )}
+          </figure>
+
+          <!-- TOC (mobile — before content) -->
+          <div class="toc-mobile animate-fade-in-up animation-delay-200">
+            <TOC headings={headings} />
+          </div>
+
+          <!-- Article Body -->
+          <article
+            id="article-body"
+            class="prose animate-fade-in-up animation-delay-200"
+            aria-label="Isi Artikel"
+          >
+            <Fragment set:html={contentHtml} />
+          </article>
+
+          <!-- Social Share -->
+          <div class="animate-fade-in-up animation-delay-300">
+            <SocialShare url={articleUrl} title={article.title} />
+          </div>
+
+          <!-- Author Box -->
+          {article.author && (
+            <aside class="author-box animate-fade-in-up animation-delay-300" aria-label="Tentang penulis">
+              {article.author.profilePicture ? (
+                <img
+                  src={authorImageUrl}
+                  alt={article.author.name}
+                  class="author-box-avatar"
+                  width="64"
+                  height="64"
+                  loading="lazy"
+                />
+              ) : (
+                <div class="author-box-avatar author-box-placeholder" aria-hidden="true">
+                  {article.author.name.charAt(0)}
+                </div>
+              )}
+              <div class="author-box-info">
+                <span class="author-box-label">Ditulis oleh</span>
+                <strong class="author-box-name">{article.author.name}</strong>
+                {article.author.bio && (
+                  <p class="author-box-bio">{article.author.bio}</p>
+                )}
+                {article.author.socialLinks && article.author.socialLinks.length > 0 && (
+                  <div class="author-box-social" aria-label="Media sosial penulis">
+                    {article.author.socialLinks.map(link => (
+                      <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="author-social-link"
+                        aria-label={`${article.author?.name} di ${link.platform}`}
+                      >
+                        {link.platform}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </aside>
+          )}
+
+          <!-- Related Articles -->
+          <RelatedArticles
+            articleId={article.id}
+            categoryIds={categoryIds}
+          />
+        </div>
+
+        <!-- ── Sidebar (TOC sticky on desktop) ──────────── -->
+        <aside class="article-sidebar" aria-label="Sidebar artikel">
+          <div class="sidebar-sticky">
+            <TOC headings={headings} />
+
+            <!-- Back to top -->
+            <button id="back-to-top" class="back-to-top" aria-label="Kembali ke atas halaman">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polyline points="18 15 12 9 6 15"/>
+              </svg>
+              Kembali ke Atas
+            </button>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .article-page {
+    padding: 6rem 0 8rem;
+  }
+
+  .breadcrumb ol {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 3rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .breadcrumb a {
+    color: var(--color-text-tertiary);
+    text-decoration: none;
+    transition: color var(--timing);
+  }
+
+  .breadcrumb a:hover { color: var(--color-accent-blue); }
+  .breadcrumb span { color: var(--color-text-primary); }
+
+  .article-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4rem;
+  }
+
+  @media (min-width: 1024px) {
+    .article-layout {
+      grid-template-columns: 1fr 300px;
+    }
+  }
+
+  /* Header */
+  .article-header {
+    margin-bottom: 4rem;
+    max-width: 850px;
+  }
+
+  .article-cats {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .article-title {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    margin-bottom: 2rem;
+  }
+
+  .article-excerpt {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin-bottom: 3rem;
+    border-left: 3px solid var(--color-border);
+    padding-left: 1.5rem;
+  }
+
+  /* Meta Bar */
+  .article-meta-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .article-author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .author-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .author-name {
+    display: block;
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .author-label {
+    font-size: 0.75rem;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .meta-right {
+    display: flex;
+    gap: 2rem;
+    color: var(--color-text-tertiary);
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Featured Image */
+  .article-featured-img {
+    margin: 4rem 0;
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-premium);
+  }
+
+  .featured-img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 21/9;
+    object-fit: cover;
+  }
+
+  /* Sidebar Sticky */
+  .sidebar-sticky {
+    position: sticky;
+    top: 6rem;
+  }
+
+  .back-to-top {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color var(--timing);
+  }
+
+  .back-to-top:hover {
+    color: var(--color-accent-blue);
+  }
+
+  /* Author Box */
+  .author-box {
+    margin: 6rem 0;
+    padding: 3rem;
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-2xl);
+    display: flex;
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  .author-box-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: var(--shadow-md);
+  }
+
+  .author-box-name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .author-box-bio {
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .author-social-link {
+    font-weight: 700;
+    color: var(--color-accent-blue);
+    margin-right: 1.5rem;
+    font-size: 0.875rem;
+  }
+</style>
+
+<script>
+  // Back to top
+  document.getElementById('back-to-top')?.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+</script>

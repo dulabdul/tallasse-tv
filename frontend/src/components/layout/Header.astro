@@ -1,0 +1,358 @@
+---
+import { getSiteSettings } from '@/lib/payload';
+import type { SiteSettings } from '@/lib/payload';
+
+const settings: SiteSettings = await getSiteSettings().catch(() => ({
+  siteName: 'TallasseeTV',
+  tagline: 'Berita & Informasi Terkini',
+  socialLinks: [],
+}));
+
+const navLinks = [
+  { href: '/', label: 'Beranda' },
+  { href: '/artikel', label: 'Artikel' },
+  { href: '/tentang-kami', label: 'Tentang Kami' },
+  { href: '/kontak', label: 'Kontak' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header
+  id="site-header"
+  class="site-header"
+  role="banner"
+>
+  <div class="container header-inner">
+    <!-- Logo / Brand -->
+    <a href="/" class="brand" aria-label={`${settings.siteName} — Kembali ke Beranda`}>
+      {settings.logo ? (
+        <img
+          src={settings.logo.url}
+          alt={settings.siteName}
+          class="brand-logo"
+          width="140"
+          height="36"
+          loading="eager"
+        />
+      ) : (
+        <span class="brand-text">
+          <span class="brand-name">{settings.siteName}</span>
+          {settings.tagline && (
+            <span class="brand-tagline">{settings.tagline}</span>
+          )}
+        </span>
+      )}
+    </a>
+
+    <!-- Desktop Navigation -->
+    <nav id="main-nav" class="main-nav" aria-label="Navigasi Utama">
+      <ul role="list">
+        {navLinks.map(link => {
+          const isActive = link.href === '/'
+            ? currentPath === '/'
+            : currentPath.startsWith(link.href);
+          return (
+            <li>
+              <a
+                href={link.href}
+                class={`nav-link ${isActive ? 'nav-link--active' : ''}`}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                {link.label}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+
+    <!-- Actions -->
+    <div class="header-actions">
+      <!-- Theme Toggle -->
+      <button
+        id="theme-toggle"
+        class="icon-btn"
+        aria-label="Toggle dark/light mode"
+        title="Ganti tema"
+      >
+        <!-- Sun icon -->
+        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <!-- Moon icon -->
+        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+
+      <!-- Mobile Menu Toggle -->
+      <button
+        id="mobile-menu-toggle"
+        class="icon-btn mobile-only"
+        aria-label="Buka menu navigasi"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <svg id="hamburger-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+        <svg id="close-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="mobile-menu" role="dialog" aria-label="Menu Navigasi Mobile" hidden>
+    <nav aria-label="Navigasi Mobile">
+      <ul role="list">
+        {navLinks.map(link => {
+          const isActive = link.href === '/'
+            ? currentPath === '/'
+            : currentPath.startsWith(link.href);
+          return (
+            <li>
+              <a
+                href={link.href}
+                class={`mobile-nav-link ${isActive ? 'mobile-nav-link--active' : ''}`}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                {link.label}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: color-mix(in srgb, var(--color-bg) 85%, transparent);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border-bottom: 1px solid var(--color-border);
+    height: var(--nav-height);
+    transition: background var(--timing), border-color var(--timing);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    gap: 1rem;
+  }
+
+  /* Brand */
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .brand-logo {
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+
+  .brand-name {
+    font-size: 1.125rem;
+    font-weight: 800;
+    color: var(--color-text-primary);
+    background: linear-gradient(135deg, var(--color-accent), var(--color-accent-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.03em;
+  }
+
+  .brand-tagline {
+    font-size: 0.6875rem;
+    color: var(--color-text-tertiary);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* Desktop Nav */
+  .main-nav {
+    display: flex;
+    align-items: center;
+  }
+
+  .main-nav ul {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-link {
+    padding: 0.4rem 0.875rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    border-radius: var(--radius-md);
+    transition: color var(--timing), background var(--timing);
+    text-decoration: none;
+  }
+
+  .nav-link:hover {
+    color: var(--color-text-primary);
+    background: var(--color-bg-secondary);
+  }
+
+  .nav-link--active {
+    color: var(--color-accent);
+    background: var(--color-accent-bg);
+  }
+
+  /* Header Actions */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-md);
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    transition: all var(--timing);
+    cursor: pointer;
+  }
+
+  .icon-btn:hover {
+    background: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    border-color: var(--color-text-tertiary);
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  /* Mobile */
+  .mobile-only {
+    display: none;
+  }
+
+  .mobile-menu {
+    background: var(--color-bg);
+    border-top: 1px solid var(--color-border);
+    padding: 1rem;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .mobile-menu ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .mobile-nav-link {
+    display: block;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    border-radius: var(--radius-md);
+    transition: all var(--timing);
+    text-decoration: none;
+  }
+
+  .mobile-nav-link:hover,
+  .mobile-nav-link--active {
+    color: var(--color-accent);
+    background: var(--color-accent-bg);
+  }
+
+  @media (max-width: 768px) {
+    .main-nav {
+      display: none;
+    }
+    .mobile-only {
+      display: flex;
+    }
+  }
+</style>
+
+<script>
+  // ── Theme Toggle ─────────────────────────────────────────
+  const themeToggle = document.getElementById('theme-toggle');
+  const html = document.documentElement;
+
+  function getTheme() {
+    return localStorage.getItem('theme') ||
+      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+
+  function applyTheme(theme: string) {
+    html.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  }
+
+  // Apply on load
+  applyTheme(getTheme());
+
+  themeToggle?.addEventListener('click', () => {
+    const current = html.getAttribute('data-theme') || 'light';
+    applyTheme(current === 'dark' ? 'light' : 'dark');
+  });
+
+  // ── Mobile Menu ──────────────────────────────────────────
+  const mobileToggle = document.getElementById('mobile-menu-toggle');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const hamburgerIcon = document.getElementById('hamburger-icon');
+  const closeIcon = document.getElementById('close-icon');
+
+  mobileToggle?.addEventListener('click', () => {
+    const isOpen = !mobileMenu?.hidden;
+    if (mobileMenu) mobileMenu.hidden = isOpen;
+    mobileToggle.setAttribute('aria-expanded', String(!isOpen));
+    hamburgerIcon?.classList.toggle('hidden', !isOpen);
+    closeIcon?.classList.toggle('hidden', isOpen);
+  });
+
+  // Close mobile menu on resize
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 768 && mobileMenu) {
+      mobileMenu.hidden = true;
+      mobileToggle?.setAttribute('aria-expanded', 'false');
+      hamburgerIcon?.classList.remove('hidden');
+      closeIcon?.classList.add('hidden');
+    }
+  });
+
+  // ── Scroll effect ─────────────────────────────────────────
+  const header = document.getElementById('site-header');
+  window.addEventListener('scroll', () => {
+    header?.classList.toggle('scrolled', window.scrollY > 10);
+  }, { passive: true });
+</script>

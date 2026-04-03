@@ -1,0 +1,206 @@
+---
+/**
+ * Table of Contents — Auto-generated dari headings artikel
+ * Client-side: highlights active heading on scroll
+ */
+import type { Heading } from '@/lib/utils';
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+
+if (!headings || headings.length < 2) {
+  // Skip rendering if < 2 headings
+}
+---
+
+{headings.length >= 2 && (
+  <nav
+    id="toc"
+    class="toc"
+    aria-label="Daftar Isi"
+  >
+    <div class="toc-header">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+      </svg>
+      <span>Daftar Isi</span>
+      <button id="toc-toggle" class="toc-toggle" aria-label="Sembunyikan daftar isi" aria-expanded="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <polyline points="18 15 12 9 6 15"/>
+        </svg>
+      </button>
+    </div>
+
+    <ol id="toc-list" class="toc-list" role="list">
+      {headings.map(heading => (
+        <li
+          class={`toc-item toc-item--h${heading.level}`}
+          style={`padding-left: ${(heading.level - 2) * 0.875}rem`}
+        >
+          <a
+            href={`#${heading.id}`}
+            class="toc-link"
+            data-toc-id={heading.id}
+          >
+            {heading.text}
+          </a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+)}
+
+<style>
+  .toc {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 1rem;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+  }
+
+  .toc-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    font-size: 0.9375rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .toc-toggle {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    color: var(--color-text-tertiary);
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: var(--radius-sm);
+    transition: all var(--timing);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .toc-toggle:hover {
+    color: var(--color-text-primary);
+    background: var(--color-border);
+  }
+
+  .toc-toggle svg {
+    transition: transform 0.25s ease;
+  }
+
+  .toc-toggle[aria-expanded="false"] svg {
+    transform: rotate(180deg);
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    max-height: 1200px;
+    opacity: 1;
+  }
+
+  .toc-list.collapsed {
+    max-height: 0;
+    opacity: 0;
+  }
+
+  .toc-item {
+    line-height: 1.4;
+  }
+
+  .toc-link {
+    display: block;
+    padding: 0.3rem 0.5rem;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-sm);
+    border-left: 2px solid transparent;
+    transition: all var(--timing);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .toc-link:hover {
+    color: var(--color-accent);
+    background: var(--color-accent-bg);
+    border-left-color: var(--color-accent);
+  }
+
+  .toc-link.active {
+    color: var(--color-accent);
+    background: var(--color-accent-bg);
+    border-left-color: var(--color-accent);
+    font-weight: 500;
+  }
+</style>
+
+<script>
+  // ── TOC Toggle ─────────────────────────────────────────────
+  const tocToggle = document.getElementById('toc-toggle');
+  const tocList = document.getElementById('toc-list');
+
+  tocToggle?.addEventListener('click', () => {
+    const isExpanded = tocToggle.getAttribute('aria-expanded') === 'true';
+    tocToggle.setAttribute('aria-expanded', String(!isExpanded));
+    tocList?.classList.toggle('collapsed', isExpanded);
+    tocToggle.setAttribute('aria-label', isExpanded ? 'Tampilkan daftar isi' : 'Sembunyikan daftar isi');
+  });
+
+  // ── Active heading on scroll ────────────────────────────────
+  const tocLinks = document.querySelectorAll<HTMLAnchorElement>('[data-toc-id]');
+  if (tocLinks.length > 0) {
+    const headingEls = Array.from(tocLinks).map(link => {
+      return document.getElementById(link.dataset.tocId || '');
+    }).filter(Boolean) as HTMLElement[];
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            // Remove active from all
+            tocLinks.forEach(l => l.classList.remove('active'));
+            // Add active to matching link
+            const id = entry.target.id;
+            const activeLink = document.querySelector(`[data-toc-id="${id}"]`);
+            activeLink?.classList.add('active');
+          }
+        });
+      },
+      {
+        rootMargin: `-${parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-height') || '64')}px 0px -70% 0px`,
+        threshold: 0,
+      }
+    );
+
+    headingEls.forEach(h => observer.observe(h));
+  }
+
+  // ── Smooth scroll for TOC links ──────────────────────────────
+  document.querySelectorAll<HTMLAnchorElement>('.toc-link').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const id = link.getAttribute('href')?.slice(1);
+      if (!id) return;
+      const target = document.getElementById(id);
+      if (target) {
+        const navHeight = 80;
+        const top = target.getBoundingClientRect().top + window.scrollY - navHeight;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    });
+  });
+</script>

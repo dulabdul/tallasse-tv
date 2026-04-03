@@ -1,0 +1,75 @@
+---
+/**
+ * SEO Component — Dynamic meta tags + Open Graph + Twitter Card
+ */
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  imageAlt?: string;
+  url?: string;
+  canonicalUrl?: string;
+  type?: 'website' | 'article';
+  publishedAt?: string;
+  updatedAt?: string;
+  author?: string;
+  noIndex?: boolean;
+  siteName?: string;
+}
+
+const {
+  title,
+  description = 'TallasseeTV — Menyajikan berita dan informasi terkini yang akurat dan terpercaya.',
+  image = '/images/og-default.jpg',
+  imageAlt = 'TallasseeTV',
+  url = Astro.url.href,
+  canonicalUrl,
+  type = 'website',
+  publishedAt,
+  updatedAt,
+  author,
+  noIndex = false,
+  siteName = 'TallasseeTV',
+} = Astro.props;
+
+const canonical = canonicalUrl || url;
+const fullTitle = title.includes(siteName) ? title : `${title} — ${siteName}`;
+const absoluteImage = image.startsWith('http') ? image : `${import.meta.env.PUBLIC_SITE_URL || 'https://tallasseetv.com'}${image}`;
+---
+
+<!-- Primary Meta -->
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+{noIndex && <meta name="robots" content="noindex, nofollow" />}
+{!noIndex && <meta name="robots" content="index, follow" />}
+<link rel="canonical" href={canonical} />
+
+<!-- Open Graph -->
+<meta property="og:site_name" content={siteName} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={url} />
+<meta property="og:type" content={type} />
+<meta property="og:image" content={absoluteImage} />
+<meta property="og:image:alt" content={imageAlt} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="id_ID" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={absoluteImage} />
+<meta name="twitter:image:alt" content={imageAlt} />
+
+<!-- Article specific -->
+{type === 'article' && publishedAt && (
+  <meta property="article:published_time" content={publishedAt} />
+)}
+{type === 'article' && updatedAt && (
+  <meta property="article:modified_time" content={updatedAt} />
+)}
+{type === 'article' && author && (
+  <meta property="article:author" content={author} />
+)}

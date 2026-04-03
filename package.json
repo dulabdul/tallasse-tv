@@ -1,0 +1,13 @@
+{
+  "name": "tallasseetv-blog",
+  "version": "1.0.0",
+  "description": "TallasseeTV Blog — Astro v5 + Payload CMS v3 Monorepo",
+  "private": true,
+  "scripts": {
+    "dev:cms": "cd cms && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "cd cms && npm install && cd ../frontend && npm install",
+    "build:frontend": "cd frontend && npm run build",
+    "build:cms": "cd cms && npm run build"
+  }
+}
