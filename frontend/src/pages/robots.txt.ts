@@ -1,4 +1,3 @@
----
 // robots.txt — auto-generated
 export async function GET() {
   const siteUrl = import.meta.env.PUBLIC_SITE_URL || 'https://tallasseetv.com';
