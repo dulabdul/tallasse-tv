@@ -6,6 +6,7 @@ import Header from '@/components/layout/Header.astro';
 import Footer from '@/components/layout/Footer.astro';
 import SEO from '@/components/seo/SEO.astro';
 import JsonLd from '@/components/seo/JsonLd.astro';
+import { getSiteSettings } from '@/lib/payload';
 import '@/styles/global.css';
 
 interface Props {
@@ -27,12 +28,15 @@ interface Props {
   };
   jsonLdRaw?: string; // New: Direct JSON string from CMS
   gtmId?: string; // New: GTM ID
+  googleVerification?: string; // New: Google Search Console
   class?: string;
 }
 
+const settings = await getSiteSettings();
+
 const {
   title,
-  description,
+  description = settings?.seo?.defaultDescription,
   image,
   imageAlt,
   canonicalUrl,
@@ -41,10 +45,11 @@ const {
   updatedAt,
   author,
   noIndex,
-  siteName,
+  siteName = settings?.siteName || 'TallasseeTV',
   jsonLd,
   jsonLdRaw,
-  gtmId,
+  gtmId = settings?.seo?.gtmId,
+  googleVerification = settings?.seo?.googleVerification,
   class: className,
 } = Astro.props;
 ---
@@ -100,6 +105,7 @@ const {
       author={author}
       noIndex={noIndex}
       siteName={siteName}
+      googleVerification={googleVerification}
     />
 
     <!-- JSON-LD (Pre-gen from CMS) -->

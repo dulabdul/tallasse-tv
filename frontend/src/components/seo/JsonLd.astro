@@ -15,7 +15,8 @@ interface Props {
 }
 
 const { type, data, breadcrumbs } = Astro.props;
-const siteUrl = import.meta.env.PUBLIC_SITE_URL || 'https://tallasseetv.com';
+const siteUrl =
+  import.meta.env.PUBLIC_SITE_URL || 'https://www.tallasseetv.com';
 
 function buildArticleSchema(d: Record<string, any>) {
   return {
@@ -52,15 +53,9 @@ function buildArticleSchema(d: Record<string, any>) {
       '@type': 'WebPage',
       '@id': d.url,
     },
-    ...(d.readingTime
-      ? { timeRequired: `PT${d.readingTime}M` }
-      : {}),
-    ...(d.categories?.length
-      ? { articleSection: d.categories[0] }
-      : {}),
-    ...(d.keywords?.length
-      ? { keywords: d.keywords.join(', ') }
-      : {}),
+    ...(d.readingTime ? { timeRequired: `PT${d.readingTime}M` } : {}),
+    ...(d.categories?.length ? { articleSection: d.categories[0] } : {}),
+    ...(d.keywords?.length ? { keywords: d.keywords.join(', ') } : {}),
   };
 }
 
@@ -83,7 +78,8 @@ function buildWebsiteSchema() {
     '@type': 'WebSite',
     name: 'TallasseeTV',
     url: siteUrl,
-    description: 'TallasseeTV — Menyajikan berita dan informasi terkini yang akurat dan terpercaya.',
+    description:
+      'TallasseeTV — Menyajikan berita dan informasi terkini yang akurat dan terpercaya.',
     inLanguage: 'id-ID',
     potentialAction: {
       '@type': 'SearchAction',
@@ -125,6 +121,11 @@ if (breadcrumbs?.length) {
 }
 ---
 
-{schemas.map((schema) => (
-  <script type="application/ld+json" set:html={JSON.stringify(schema, null, 0)} />
-))}
+{
+  schemas.map((schema) => (
+    <script
+      type='application/ld+json'
+      set:html={JSON.stringify(schema, null, 0)}
+    />
+  ))
+}

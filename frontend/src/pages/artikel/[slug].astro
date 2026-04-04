@@ -12,7 +12,7 @@ import { blocksToHtml, formatDate, truncate } from '@/lib/utils';
 // ── Static Path Generation ─────────────────────────────────────────────────────
 export async function getStaticPaths() {
   const slugs = await getAllArticleSlugs();
-  return slugs.map(slug => ({ params: { slug } }));
+  return slugs.map((slug) => ({ params: { slug } }));
 }
 
 // ── Data Fetching ──────────────────────────────────────────────────────────────
@@ -27,13 +27,18 @@ if (!article) {
 }
 
 // Derived data
-const siteUrl = import.meta.env.PUBLIC_SITE_URL || 'https://tallasseetv.com';
+const siteUrl =
+  import.meta.env.PUBLIC_SITE_URL || 'https://www.tallasseetv.com';
 const articleUrl = `${siteUrl}/artikel/${article.slug}`;
 const featuredImageUrl = getMediaUrl(article.featuredImage, 'hero');
-const ogImageUrl = getMediaUrl(article.seo?.ogImage || article.featuredImage, 'hero');
+const ogImageUrl = getMediaUrl(
+  article.seo?.ogImage || article.featuredImage,
+  'hero',
+);
 
 const seoTitle = article.seo?.title || article.title;
-const seoDesc = article.seo?.description || article.excerpt || truncate(article.title, 160);
+const seoDesc =
+  article.seo?.description || article.excerpt || truncate(article.title, 160);
 const publishDate = article.publishedAt || article.createdAt;
 
 // Rich text → HTML
@@ -45,70 +50,76 @@ const contentHtml = blocksToHtml(article.content);
   description={seoDesc}
   image={ogImageUrl}
   imageAlt={article.title}
-  type="article"
+  type='article'
   publishedAt={new Date(publishDate).toISOString()}
   updatedAt={new Date(article.updatedAt).toISOString()}
   author={article.author?.name}
   jsonLdRaw={article.jsonLd}
-  gtmId={settings?.seo?.gtmId}
->
-  <article class="article-detail">
+  gtmId={settings?.seo?.gtmId}>
+  <article class='article-detail'>
     <!-- Header: Title & Categories -->
-    <header class="article-header">
-      <div class="container--narrow">
-        <div class="article-category">
+    <header class='article-header'>
+      <div class='container--narrow'>
+        <div class='article-category'>
           {article.categories?.[0]?.name || 'Blog'}
         </div>
-        <h1 class="article-title">{article.title}</h1>
-        {article.excerpt && <p class="article-subtitle">{article.excerpt}</p>}
+        <h1 class='article-title'>{article.title}</h1>
+        {article.excerpt && <p class='article-subtitle'>{article.excerpt}</p>}
       </div>
     </header>
 
     <!-- Hero Image -->
-    <div class="article-hero">
-      <div class="container--wide">
+    <div class='article-hero'>
+      <div class='container--wide'>
         <img
           src={featuredImageUrl}
           alt={article.title}
-          class="hero-image"
-          loading="eager"
+          class='hero-image'
+          loading='eager'
         />
       </div>
     </div>
 
     <!-- Meta Bar & Share -->
-    <div class="article-meta-section">
-      <div class="container--narrow">
-        <div class="meta-bar">
-          <div class="meta-left">
-            <span class="meta-label">Written by</span>
-            <span class="meta-value">{article.author?.name || 'Redaksi'}</span>
-            <span class="meta-divider">|</span>
-            <span class="meta-label">Published on</span>
-            <span class="meta-value">{formatDate(publishDate)}</span>
+    <div class='article-meta-section'>
+      <div class='container--narrow'>
+        <div class='meta-bar'>
+          <div class='meta-left'>
+            <span class='meta-label'>Written by</span>
+            <span class='meta-value'>{article.author?.name || 'Redaksi'}</span>
+            <span class='meta-divider'>|</span>
+            <span class='meta-label'>Published on</span>
+            <span class='meta-value'>{formatDate(publishDate)}</span>
           </div>
-          <div class="meta-right">
-             <SocialShare url={articleUrl} title={article.title} />
+          <div class='meta-right'>
+            <SocialShare
+              url={articleUrl}
+              title={article.title}
+            />
           </div>
         </div>
       </div>
     </div>
 
     <!-- Content -->
-    <div class="article-content-section">
-      <div class="container--narrow">
-        <div class="prose">
+    <div class='article-content-section'>
+      <div class='container--narrow'>
+        <div class='prose'>
           <Fragment set:html={contentHtml} />
         </div>
       </div>
     </div>
 
     <!-- Footer of article (Author bio if needed, or simple Divider) -->
-    <footer class="article-footer">
-       <div class="container--narrow">
-         <div class="footer-divider"></div>
-         <a href="/artikel" class="back-to-blog">← Back to blog</a>
-       </div>
+    <footer class='article-footer'>
+      <div class='container--narrow'>
+        <div class='footer-divider'></div>
+        <a
+          href='/artikel'
+          class='back-to-blog'
+          >← Back to blog</a
+        >
+      </div>
     </footer>
   </article>
 </BaseLayout>

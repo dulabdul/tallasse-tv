@@ -1,24 +1,22 @@
-// robots.txt — auto-generated
 export async function GET() {
-  const siteUrl = import.meta.env.PUBLIC_SITE_URL || 'https://tallasseetv.com';
+  const siteUrl = import.meta.env.PUBLIC_SITE_URL || 'https://www.tallasseetv.com';
+  
   const content = `# robots.txt — TallasseeTV
-# Generated automatically
+# Generated automatically for SEO
 
 User-agent: *
 Allow: /
 
-# Block CMS admin panel from indexing
+# Sitemap Index
+Sitemap: ${siteUrl}/sitemap.xml
+
+# Restricted areas
 Disallow: /admin/
 Disallow: /api/
+Disallow: /_astro/
+Disallow: /_payload/
 
-# Allow search engines to follow pagination
-Allow: /artikel?halaman=
-Allow: /kategori/
-
-# Sitemap
-Sitemap: ${siteUrl}/sitemap-index.xml
-
-# Crawl delay (optional, in seconds)
+# Crawl delay
 Crawl-delay: 1
 `;
 

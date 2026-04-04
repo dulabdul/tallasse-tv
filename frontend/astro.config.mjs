@@ -1,18 +1,10 @@
 import { defineConfig } from 'astro/config';
-import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  site: 'https://tallasseetv.com',
+  site: 'https://www.tallasseetv.com',
   output: 'static',
-  integrations: [
-    sitemap({
-      filter: (page) => !page.includes('/api/'),
-      changefreq: 'weekly',
-      priority: 0.7,
-      lastmod: new Date(),
-    }),
-  ],
+  integrations: [],
   vite: {
     plugins: [tailwindcss()],
   },

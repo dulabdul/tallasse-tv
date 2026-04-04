@@ -99,7 +99,7 @@ export const Articles: CollectionConfig = {
         }
 
         // 4. Auto-generate JSON-LD (BlogPosting)
-        const siteUrl = process.env.FRONTEND_URL || 'https://tallasseetv.com'
+        const siteUrl = process.env.FRONTEND_URL || 'https://www.tallasseetv.com'
         const articleUrl = `${siteUrl}/artikel/${data.slug || originalDoc?.slug}`
         
         const jsonLdObj = {
