@@ -296,6 +296,10 @@ export interface Article {
     noIndex?: boolean | null;
   };
   /**
+   * Generated otomatis untuk SEO. Jangan diubah manual.
+   */
+  jsonLd?: string | null;
+  /**
    * Auto-generated. Bisa diubah manual.
    */
   slug?: string | null;
@@ -549,6 +553,7 @@ export interface ArticlesSelect<T extends boolean = true> {
         canonicalUrl?: T;
         noIndex?: T;
       };
+  jsonLd?: T;
   slug?: T;
   featuredImage?: T;
   status?: T;
@@ -631,6 +636,10 @@ export interface SiteSetting {
   };
   seo?: {
     /**
+     * Format: GTM-XXXXXXX. Kosongkan jika tidak digunakan.
+     */
+    gtmId?: string | null;
+    /**
      * Gunakan %s sebagai placeholder untuk judul halaman
      */
     defaultTitle?: string | null;
@@ -670,6 +679,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   seo?:
     | T
     | {
+        gtmId?: T;
         defaultTitle?: T;
         defaultDescription?: T;
         googleVerification?: T;

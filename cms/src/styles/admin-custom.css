@@ -1,0 +1,38 @@
+/* Custom Admin Styles for TallasseeTV CMS */
+
+/* Fix for Relationship Dropdown (React Select) Clipping & Scrolling */
+.rs__menu {
+  z-index: 1000 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid var(--color-base-100) !important;
+}
+
+.rs__menu-list {
+  max-height: 300px !important; /* Limit height to prevent clipping */
+  overflow-y: auto !important; /* Enable internal scrolling */
+  padding: 0.5rem !important;
+}
+
+/* Ensure the dropdown list doesn't get cut off on mobile/small viewports */
+@media (max-height: 600px) {
+  .rs__menu-list {
+    max-height: 200px !important;
+  }
+}
+
+/* Improvements for the Select items */
+.rs__option {
+  padding: 10px 15px !important;
+  border-radius: 4px !important;
+  font-size: 0.9rem !important;
+  cursor: pointer !important;
+}
+
+.rs__option--is-focused {
+  background-color: var(--color-base-100) !important;
+}
+
+.rs__option--is-selected {
+  background-color: var(--color-primary-500) !important;
+  color: white !important;
+}

@@ -1,4 +1,5 @@
 import React from 'react'
+import '../../styles/admin-custom.css'
 
 export const Logo: React.FC = () => {
   return (

@@ -65,6 +65,7 @@ export interface Article {
   updatedAt: string;
   createdAt: string;
   seo?: ArticleSeo;
+  jsonLd?: string; // New: Pre-generated JSON-LD from CMS
 }
 
 export interface SiteSettings {
@@ -86,6 +87,7 @@ export interface SiteSettings {
     address?: string;
   };
   seo?: {
+    gtmId?: string; // New: GTM ID
     defaultTitle?: string;
     defaultDescription?: string;
     googleVerification?: string;

@@ -60,10 +60,16 @@ export const Articles: CollectionConfig = {
     read: ({ req }): boolean | Where => {
       // Published articles are public; drafts need auth
       if (req.user) return true
+      
+      // Force visibility for "today" by adding a 24h buffer to account for UTC/GMT+7 transitions
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      tomorrow.setHours(0, 0, 0, 0)
+
       return {
         and: [
           { status: { equals: 'published' } },
-          { publishedAt: { less_than_equal: new Date().toISOString() } },
+          { publishedAt: { less_than_equal: tomorrow.toISOString() } },
         ],
       }
     },
@@ -71,15 +77,57 @@ export const Articles: CollectionConfig = {
   hooks: {
     beforeChange: [
       ({ data, originalDoc }) => {
-        // Auto-calculate reading time before saving
+        // 1. Auto-calculate reading time
         if (data.content) {
           data.readingTime = calculateReadingTime(data.content)
         }
         
-        // Auto-set publishedAt if status becomes 'published' and it's empty
+        // 2. Auto-set publishedAt if status becomes 'published'
         if (data.status === 'published' && (!data.publishedAt && !originalDoc?.publishedAt)) {
           data.publishedAt = new Date().toISOString()
         }
+
+        // 3. Auto-fill SEO fields if empty
+        if (data.title && !data.seo?.title) {
+          data.seo = { ...(data.seo || {}), title: data.title }
+        }
+        if (data.excerpt && !data.seo?.description) {
+          data.seo = { ...(data.seo || {}), description: data.excerpt }
+        }
+        if (data.featuredImage && !data.seo?.ogImage) {
+          data.seo = { ...(data.seo || {}), ogImage: data.featuredImage }
+        }
+
+        // 4. Auto-generate JSON-LD (BlogPosting)
+        const siteUrl = process.env.FRONTEND_URL || 'https://tallasseetv.com'
+        const articleUrl = `${siteUrl}/artikel/${data.slug || originalDoc?.slug}`
+        
+        const jsonLdObj = {
+          '@context': 'https://schema.org',
+          '@type': 'BlogPosting',
+          headline: data.title || originalDoc?.title,
+          description: data.excerpt || data.seo?.description || originalDoc?.excerpt,
+          image: data.featuredImage ? `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/api/media/file/${data.featuredImage}` : undefined,
+          datePublished: data.publishedAt || originalDoc?.publishedAt,
+          dateModified: new Date().toISOString(),
+          author: {
+            '@type': 'Person',
+            name: 'Redaksi TallasseeTV', // Fallback
+          },
+          publisher: {
+            '@type': 'Organization',
+            name: 'TallasseeTV',
+            logo: {
+              '@type': 'ImageObject',
+              url: `${siteUrl}/logo.png`,
+            }
+          },
+          mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': articleUrl,
+          },
+        }
+        data.jsonLd = JSON.stringify(jsonLdObj)
         
         return data
       },
@@ -209,6 +257,16 @@ export const Articles: CollectionConfig = {
                 },
               ],
             },
+            {
+              name: 'jsonLd',
+              type: 'code',
+              label: 'JSON-LD (Auto-generated)',
+              admin: {
+                language: 'json',
+                readOnly: true,
+                description: 'Generated otomatis untuk SEO. Jangan diubah manual.',
+              },
+            },
           ],
         },
       ],
@@ -256,7 +314,10 @@ export const Articles: CollectionConfig = {
       label: 'Tanggal Tayang',
       admin: {
         position: 'sidebar',
-        date: { pickerAppearance: 'dayAndTime' },
+        date: { 
+          pickerAppearance: 'dayOnly',
+          displayFormat: 'd MMM yyyy', 
+        },
       },
     },
     {
@@ -273,8 +334,9 @@ export const Articles: CollectionConfig = {
       relationTo: 'categories',
       label: 'Kategori',
       hasMany: true,
-      maxRows: 2,
-      admin: { position: 'sidebar' },
+      admin: { 
+        position: 'sidebar',
+      },
     },
     {
       name: 'readingTime',

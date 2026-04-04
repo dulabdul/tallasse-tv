@@ -25,6 +25,8 @@ interface Props {
     data: Record<string, any>;
     breadcrumbs?: Array<{ name: string; url: string }>;
   };
+  jsonLdRaw?: string; // New: Direct JSON string from CMS
+  gtmId?: string; // New: GTM ID
   class?: string;
 }
 
@@ -41,6 +43,8 @@ const {
   noIndex,
   siteName,
   jsonLd,
+  jsonLdRaw,
+  gtmId,
   class: className,
 } = Astro.props;
 ---
@@ -52,13 +56,25 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
+    <!-- Google Tag Manager -->
+    {gtmId && (
+      <script is:inline define:vars={{ gtmId }}>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer',gtmId);
+      </script>
+    )}
+    <!-- End Google Tag Manager -->
+
     <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <!-- Google Fonts: Outfit & Inter -->
+    <!-- Google Fonts: Raleway -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
 
@@ -86,7 +102,12 @@ const {
       siteName={siteName}
     />
 
-    <!-- JSON-LD -->
+    <!-- JSON-LD (Pre-gen from CMS) -->
+    {jsonLdRaw && (
+      <script type="application/ld+json" set:html={jsonLdRaw} />
+    )}
+
+    <!-- JSON-LD (Legacy/Manual) -->
     {jsonLd && (
       <JsonLd
         type={jsonLd.type}
@@ -98,16 +119,23 @@ const {
     <!-- Website JSON-LD (every page) -->
     <JsonLd type="website" data={{}} />
 
-    <!-- Early theme script (prevents FOUC) -->
+    <!-- Early theme script (Strict Light Mode) -->
     <script is:inline>
       (function() {
-        const stored = localStorage.getItem('theme');
-        const preferred = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', stored || preferred);
+        document.documentElement.setAttribute('data-theme', 'light');
       })();
     </script>
   </head>
   <body>
+    <!-- Google Tag Manager (noscript) -->
+    {gtmId && (
+      <noscript>
+        <iframe src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+        height="0" width="0" style="display:none;visibility:hidden"></iframe>
+      </noscript>
+    )}
+    <!-- End Google Tag Manager (noscript) -->
+
     <!-- Skip to content for accessibility -->
     <a href="#main-content" class="skip-to-content">Langsung ke konten</a>
 

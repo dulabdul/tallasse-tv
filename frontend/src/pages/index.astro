@@ -1,24 +1,15 @@
 ---
 import BaseLayout from '@/components/layout/BaseLayout.astro';
 import ArticleCard from '@/components/article/ArticleCard.astro';
-import {
-  getArticles,
-  getCategories,
-  getSiteSettings,
-  getMediaUrl,
-} from '@/lib/payload';
-import { formatReadingTime } from '@/lib/utils';
+import { getArticles, getSiteSettings } from '@/lib/payload';
 
-const [articlesData, categories, settings] = await Promise.all([
+const [articlesData, settings] = await Promise.all([
   getArticles({ limit: 7, sort: '-publishedAt' }),
-  getCategories(),
   getSiteSettings().catch(() => null),
 ]);
 
-const [featured, ...rest] = articlesData.docs;
-const latestArticles = rest.slice(0, 6);
+const [featured, ...latestArticles] = articlesData.docs;
 
-const siteUrl = import.meta.env.PUBLIC_SITE_URL || 'https://tallasseetv.com';
 const pageTitle = settings?.siteName || 'TallasseeTV';
 const pageDesc =
   settings?.seo?.defaultDescription ||
@@ -28,406 +19,142 @@ const pageDesc =
 <BaseLayout
   title={pageTitle}
   description={pageDesc}
-  type='website'
-  jsonLd={{ type: 'website', data: {} }}>
-  <!-- ═══ HERO ═══════════════════════════════════════════════════ -->
-  <section
-    class='hero-section'
-    aria-label='Beranda Hero'>
-    <div class='container'>
-      <div class='hero-grid'>
-        <div class='hero-text animate-fade-in-up'>
-          <div class='flex items-center gap-3 mb-6'>
-            <span class='badge badge-accent'>Newsroom</span>
-            <span class='text-sm font-semibold text-tertiary'>
-              {
-                new Date().toLocaleDateString('id-ID', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })
-              }
-            </span>
-          </div>
-
-          <h1 class='hero-title'>
-            Inspirasi & Wawasan <br />
-            <span class='text-gradient'>Tanpa Batas.</span>
-          </h1>
-
-          <p class='hero-desc'>
-            Menyajikan kurasi berita pilihan, analisis mendalam, dan cerita yang
-            menginspirasi langsung dari redaksi TallasseeTV.
-          </p>
-
-          <div class='hero-actions'>
-            <a
-              href='/artikel'
-              class='btn btn-primary'>
-              Mulai Membaca
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                width='18'
-                height='18'
-                viewBox='0 0 24 24'
-                fill='none'
-                stroke='currentColor'
-                stroke-width='2.5'
-                ><path d='M5 12h14m-7-7 7 7-7 7'></path></svg
-              >
-            </a>
-            <a
-              href='#terbaru'
-              class='btn btn-outline'
-              >Lihat Tren</a
-            >
-          </div>
-        </div>
-
-        <div class='hero-decoration md:block hidden'>
-          <!-- Decorative Aura -->
-          <div class='hero-aura'></div>
-        </div>
-      </div>
+  gtmId={settings?.seo?.gtmId}
+>
+  <!-- ── HERO ────────────────────────────────────────────────── -->
+  <section class='hero'>
+    <div class='container--custom'>
+      <span class='hero-label'>Blog</span>
+      <h1 class='hero-title'>
+        TallasseeTV Article <br />
+      </h1>
+      <p class='hero-subtitle'>
+        Inspirasi, wawasan, dan cerita mendalam langsung dari redaksi kami.
+      </p>
     </div>
   </section>
 
-  <!-- ═══ FEATURED ARTICLE ══════════════════════════════════════ -->
+  <!-- ── FEATURED POST ────────────────────────────────────────── -->
   {
     featured && (
-      <section
-        class='featured-section'
-        aria-label='Artikel Unggulan'>
-        <div class='container'>
-          <div class='section-header flex items-center justify-between mb-8'>
-            <h2 class='section-title'>Headline Hari Ini</h2>
-            <div class='line-decorator flex-grow mx-8 md:block hidden' />
-          </div>
-          <div class='animate-fade-in-up animation-delay-100'>
-            <ArticleCard
-              article={featured}
-              featured={true}
-            />
-          </div>
+      <section class='featured'>
+        <div class='container--custom'>
+          <ArticleCard
+            article={featured}
+            featured={true}
+          />
         </div>
       </section>
     )
   }
 
-  <!-- ═══ CATEGORIES BAR ════════════════════════════════════════ -->
-  {
-    categories.length > 0 && (
-      <section
-        class='categories-section'
-        aria-label='Jelajah Kategori'>
-        <div class='container'>
-          <div class='categories-wrapper glass-card animate-fade-in-up animation-delay-200'>
-            <div
-              class='categories-list'
-              role='list'>
-              <span class='categories-title'>Topik Populer:</span>
-              {categories.map((cat) => (
-                <a
-                  href={`/kategori/${cat.slug}`}
-                  class='cat-pill'
-                  role='listitem'>
-                  {cat.name}
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-    )
-  }
+  <!-- ── LATEST POSTS GRID ───────────────────────────────────── -->
+  <section class='latest-posts'>
+    <div class='container--custom'>
+      <h2 class='section-heading'>Featured blog posts</h2>
+      <div class='posts-grid'>
+        {latestArticles.map((article) => <ArticleCard article={article} />)}
+      </div>
 
-  <!-- ═══ LATEST ARTICLES ═══════════════════════════════════════ -->
-  {
-    latestArticles.length > 0 && (
-      <section
-        id='terbaru'
-        class='articles-section'
-        aria-label='Artikel Terbaru'>
-        <div class='container'>
-          <div class='section-header flex justify-between items-end mb-10'>
-            <div>
-              <h2 class='section-title'>Artikel Terbaru</h2>
-              <p class='text-secondary mt-2'>
-                Update informasi setiap hari untuk wawasan Anda.
-              </p>
-            </div>
-            <a
-              href='/artikel'
-              class='see-all-btn md:flex hidden'>
-              Semua Artikel
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                width='16'
-                height='16'
-                viewBox='0 0 24 24'
-                fill='none'
-                stroke='currentColor'
-                stroke-width='2.5'>
-                <path d='M5 12h14m-7-7 7 7-7 7' />
-              </svg>
-            </a>
-          </div>
-
-          <div class='articles-grid'>
-            {latestArticles.map((article, i) => (
-              <div
-                class={`animate-fade-in-up animation-delay-${((i % 3) + 1) * 100} ${i === 0 ? 'md:col-span-1' : ''}`}>
-                <ArticleCard article={article} />
-              </div>
-            ))}
-          </div>
-
-          <div class='mt-16 text-center'>
-            <a
-              href='/artikel'
-              class='btn btn-outline px-12'>
-              Lihat Lebih Banyak Artikel
-            </a>
-          </div>
-        </div>
-      </section>
-    )
-  }
-
-  <!-- ═══ NEWSLETTER CTA ══════════════════════════════════════════ -->
-  <section
-    class='cta-section'
-    aria-label='Ikuti TallasseeTV'>
-    <div class='container'>
-      <div class='cta-box animate-fade-in-up'>
-        <h2 class='cta-title text-white'>Jangan Lewatkan Berita Terbaru</h2>
-        <p class='cta-desc'>
-          Ikuti kami di media sosial untuk mendapatkan update artikel terbaru
-          dari TallasseeTV setiap hari.
-        </p>
-        <div class='cta-actions'>
-          {
-            settings?.socialLinks?.slice(0, 3).map((link) => (
-              <a
-                href={link.url}
-                target='_blank'
-                rel='noopener noreferrer'
-                class='btn btn-outline cta-social-btn'
-                aria-label={`Ikuti di ${link.platform}`}>
-                {link.label || link.platform}
-              </a>
-            ))
-          }
-          {
-            (!settings?.socialLinks || settings.socialLinks.length === 0) && (
-              <a
-                href='/kontak'
-                class='btn btn-primary'>
-                Hubungi Kami
-              </a>
-            )
-          }
-        </div>
+      <div class='view-all-container'>
+        <a
+          href='/artikel'
+          class='btn-view-all'>
+          View all posts
+        </a>
       </div>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  /* ── Hero section ────────────────────────────────────────── */
-  .hero-section {
-    padding: 8rem 0 6rem;
-    position: relative;
-    overflow: hidden;
-    background: var(--color-bg);
+  .container--custom {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
   }
 
-  .hero-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 4rem;
-    align-items: center;
+  /* Hero */
+  .hero {
+    padding: 6rem 0 4rem;
   }
 
-  @media (min-width: 1024px) {
-    .hero-grid {
-      grid-template-columns: 1.2fr 0.8fr;
-    }
+  .hero-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--color-text-primary);
   }
 
   .hero-title {
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
     font-weight: 800;
-    line-height: 1;
-    margin-bottom: 2rem;
-    letter-spacing: -0.04em;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    max-width: 900px;
   }
 
-  .hero-desc {
-    font-size: 1.25rem;
+  .hero-subtitle {
+    font-size: 1.125rem;
     color: var(--color-text-secondary);
-    max-width: 540px;
-    margin-bottom: 3rem;
-    line-height: 1.6;
+    max-width: 600px;
   }
 
-  .hero-actions {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .hero-decoration {
-    position: relative;
-    height: 400px;
-  }
-
-  .hero-aura {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 120%;
-    height: 120%;
-    background: radial-gradient(
-      circle,
-      rgba(6, 182, 212, 0.15) 0%,
-      rgba(59, 130, 246, 0.1) 40%,
-      transparent 70%
-    );
-    filter: blur(40px);
-    z-index: -1;
-  }
-
-  /* ── Featured section ───────────────────────────────────── */
-  .featured-section {
+  /* Featured */
+  .featured {
     padding-bottom: 6rem;
   }
 
-  .line-decorator {
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      var(--color-border) 0%,
-      transparent 100%
-    );
+  /* Grid Section */
+  .latest-posts {
+    padding-bottom: 8rem;
   }
 
-  /* ── Categories ────────────────────────────────────────── */
-  .categories-section {
-    margin-top: -3rem;
-    position: relative;
-    z-index: 10;
+  .section-heading {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 3rem;
   }
 
-  .categories-wrapper {
-    padding: 1.25rem 2rem;
-    border-radius: var(--radius-2xl);
-  }
-
-  .categories-list {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .categories-title {
-    font-size: 0.875rem;
-    font-weight: 700;
-    color: var(--color-text-primary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  .cat-pill {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--color-text-secondary);
-    padding: 0.5rem 1.25rem;
-    background: var(--color-bg-secondary);
-    border-radius: var(--radius-full);
-    border: 1px solid var(--color-border);
-    transition: all var(--timing);
-  }
-
-  .cat-pill:hover {
-    background: var(--color-text-primary);
-    color: var(--color-bg);
-    transform: translateY(-2px);
-  }
-
-  /* ── Articles Grid ──────────────────────────────────────── */
-  .articles-section {
-    padding: 8rem 0;
-  }
-
-  .see-all-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 700;
-    color: var(--color-accent-blue);
-    text-decoration: none;
-    transition: gap var(--timing);
-  }
-
-  .see-all-btn:hover {
-    gap: 0.75rem;
-  }
-
-  .articles-grid {
+  .posts-grid {
     display: grid;
     grid-template-columns: repeat(1, 1fr);
-    gap: 2rem;
+    gap: 3.5rem 2rem;
   }
 
   @media (min-width: 768px) {
-    .articles-grid {
+    .posts-grid {
       grid-template-columns: repeat(2, 1fr);
     }
   }
 
   @media (min-width: 1024px) {
-    .articles-grid {
+    .posts-grid {
       grid-template-columns: repeat(3, 1fr);
     }
   }
 
-  /* ── CTA section ───────────────────────────────────────── */
-  .cta-section {
-    padding-bottom: 8rem;
-  }
-
-  .cta-box {
-    background: #0f172a;
-    border-radius: var(--radius-2xl);
-    padding: 5rem 3rem;
+  .view-all-container {
+    margin-top: 5rem;
     text-align: center;
+  }
+
+  .btn-view-all {
+    display: inline-block;
+    padding: 0.75rem 2rem;
+    border: 1px solid var(--color-text-primary);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.875rem;
+    transition:
+      background var(--timing),
+      color var(--timing);
+  }
+
+  .btn-view-all:hover {
+    background: var(--color-text-primary);
     color: white;
-    position: relative;
-    overflow: hidden;
-    box-shadow: var(--shadow-premium);
-  }
-
-  .cta-title {
-    font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    margin-bottom: 1.5rem;
-  }
-
-  .cta-desc {
-    font-size: 1.125rem;
-    color: rgba(255, 255, 255, 0.7);
-    max-width: 600px;
-    margin: 0 auto 3rem;
-  }
-
-  .cta-actions {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
   }
 </style>

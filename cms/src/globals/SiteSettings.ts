@@ -123,6 +123,14 @@ export const SiteSettings: GlobalConfig = {
       label: 'SEO Global',
       fields: [
         {
+          name: 'gtmId',
+          type: 'text',
+          label: 'Google Tag Manager ID',
+          admin: {
+            description: 'Format: GTM-XXXXXXX. Kosongkan jika tidak digunakan.',
+          },
+        },
+        {
           name: 'defaultTitle',
           type: 'text',
           label: 'Default Title Template',
