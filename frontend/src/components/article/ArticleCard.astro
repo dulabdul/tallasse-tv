@@ -2,6 +2,7 @@
 import type { Article } from '@/lib/payload';
 import { getMediaUrl } from '@/lib/payload';
 import { formatDateShort, formatReadingTime } from '@/lib/utils';
+import ModernImage from '@/components/ui/ModernImage.astro'; // Added imported wrapper Component
 
 interface Props {
   article: Article;
@@ -11,6 +12,7 @@ interface Props {
 
 const { article, featured = false, class: className } = Astro.props;
 
+// imageUrl remains here for fallback/logic mapping if needed by the caller, though ModernImage handles extraction
 const imageUrl = getMediaUrl(article.featuredImage, featured ? 'hero' : 'card');
 const date = article.publishedAt || article.createdAt;
 const category = article.categories?.[0]?.name || 'Uncategorized';
@@ -19,8 +21,9 @@ const category = article.categories?.[0]?.name || 'Uncategorized';
 <article class={`article-card ${featured ? 'article-card--featured' : ''} ${className || ''}`}>
   <a href={`/artikel/${article.slug}`} class="card-link">
     <div class="card-image-container">
-      <img
-        src={imageUrl}
+      <ModernImage
+        media={article.featuredImage}
+        size={featured ? 'hero' : 'card'}
         alt={article.title}
         class="card-image"
         loading="lazy"

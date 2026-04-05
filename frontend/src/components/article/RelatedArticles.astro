@@ -2,6 +2,7 @@
 import type { Article } from '@/lib/payload';
 import { getRelatedArticles, getMediaUrl } from '@/lib/payload';
 import { formatDateShort, formatReadingTime } from '@/lib/utils';
+import ModernImage from '@/components/ui/ModernImage.astro';
 
 interface Props {
   articleId: string;
@@ -26,14 +27,15 @@ const related = await getRelatedArticles(articleId, categoryIds, limit);
         >
           <a href={`/artikel/${article.slug}`} class="related-img-link" tabindex="-1" aria-hidden="true">
             <div class="related-img-wrap">
-              <img
-                src={getMediaUrl(article.featuredImage, 'thumbnail')}
+              <ModernImage
+                media={article.featuredImage}
+                size="thumbnail"
                 alt={article.featuredImage?.alt || article.title}
                 class="related-img"
                 loading="lazy"
                 decoding="async"
-                width="400"
-                height="300"
+                width={400}
+                height={300}
               />
             </div>
           </a>

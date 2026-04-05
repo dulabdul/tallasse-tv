@@ -147,9 +147,15 @@ export function blocksToHtml(blocks: any[]): string {
         // If Payload v3 uses absolute paths or we prefix:
         const url = media.url;
         const align = block.align || 'center';
+        // Explicitly routing to Vercel's edge optimization since Astro component proxy isn't available for raw HTML strings
+        const vercelOptimized = `/_vercel/image?url=${encodeURIComponent(url)}&w=1200&q=75`;
         return `
           <figure class="align-${align}">
-            <img src="${url}" alt="${escapeHtml(media.alt || '')}" loading="lazy" />
+            <picture>
+              <source srcset="${vercelOptimized}&f=avif" type="image/avif">
+              <source srcset="${vercelOptimized}&f=webp" type="image/webp">
+              <img src="${vercelOptimized}&f=jpg" alt="${escapeHtml(media.alt || '')}" loading="lazy" decoding="async" />
+            </picture>
             ${block.caption ? `<figcaption>${escapeHtml(block.caption)}</figcaption>` : ''}
           </figure>
         `;

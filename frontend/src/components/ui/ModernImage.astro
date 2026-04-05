@@ -1,0 +1,77 @@
+---
+import { Picture } from 'astro:assets';
+import type { MediaItem } from '@/lib/payload';
+import { getMediaUrl } from '@/lib/payload';
+
+interface Props {
+  media?: MediaItem | null;
+  size?: 'thumbnail' | 'card' | 'hero';
+  src?: string;
+  alt?: string;
+  width?: number;
+  height?: number;
+  class?: string;
+  loading?: 'lazy' | 'eager';
+  decoding?: 'async' | 'sync' | 'auto';
+}
+
+const {
+  media,
+  size,
+  src,
+  alt,
+  width,
+  height,
+  class: className,
+  loading = 'lazy',
+  decoding = 'async',
+} = Astro.props;
+
+let targetSrc = src || '/images/placeholder.jpg';
+let targetWidth = width;
+let targetHeight = height;
+
+// Cerdas mengambil URL dan dimensi dari object Payload CMS
+if (media) {
+  targetSrc = getMediaUrl(media, size);
+  if (size && media.sizes?.[size]) {
+    targetWidth = targetWidth || media.sizes[size].width;
+    targetHeight = targetHeight || media.sizes[size].height;
+  } else {
+    targetWidth = targetWidth || media.width;
+    targetHeight = targetHeight || media.height;
+  }
+}
+
+// Fitur bawaan Astro V5 untuk remote images: memindai dimensi secara otomatis 
+// jika metadata ukuran tidak dilampirkan oleh props/CMS
+const needsInfer = !targetWidth || !targetHeight;
+
+// Fallback Teks Aksesibilitas
+const finalAlt = alt || media?.alt || 'TallasseeTV Media';
+---
+
+{needsInfer ? (
+  <Picture
+    src={targetSrc}
+    alt={finalAlt}
+    formats={['avif', 'webp']}
+    fallbackFormat="jpg"
+    class={className}
+    loading={loading}
+    decoding={decoding}
+    inferSize={true}
+  />
+) : (
+  <Picture
+    src={targetSrc}
+    alt={finalAlt}
+    width={targetWidth!}
+    height={targetHeight!}
+    formats={['avif', 'webp']}
+    fallbackFormat="jpg"
+    class={className}
+    loading={loading}
+    decoding={decoding}
+  />
+)}

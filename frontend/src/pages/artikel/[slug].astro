@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@/components/layout/BaseLayout.astro';
 import SocialShare from '@/components/ui/SocialShare.astro';
+import ModernImage from '@/components/ui/ModernImage.astro';
 import {
   getArticleBySlug,
   getAllArticleSlugs,
@@ -71,11 +72,13 @@ const contentHtml = blocksToHtml(article.content);
     <!-- Hero Image -->
     <div class='article-hero'>
       <div class='container--wide'>
-        <img
-          src={featuredImageUrl}
+        <ModernImage
+          media={article.featuredImage}
+          size='hero'
           alt={article.title}
           class='hero-image'
           loading='eager'
+          decoding='sync'
         />
       </div>
     </div>

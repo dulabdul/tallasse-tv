@@ -1,6 +1,7 @@
 ---
 import { getSiteSettings } from '@/lib/payload';
 import type { SiteSettings } from '@/lib/payload';
+import ModernImage from '@/components/ui/ModernImage.astro';
 
 const settings: SiteSettings = await getSiteSettings().catch(() => ({
   siteName: 'TallasseeTV',
@@ -27,13 +28,14 @@ const currentPath = Astro.url.pathname;
     <!-- Logo / Brand -->
     <a href="/" class="brand" aria-label={`${settings.siteName} — Kembali ke Beranda`}>
       {settings.logo ? (
-        <img
-          src={settings.logo.url}
+        <ModernImage
+          media={settings.logo}
           alt={settings.siteName}
           class="brand-logo"
-          width="140"
-          height="36"
+          width={140}
+          height={36}
           loading="eager"
+          decoding="sync"
         />
       ) : (
         <span class="brand-text">
