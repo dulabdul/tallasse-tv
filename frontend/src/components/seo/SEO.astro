@@ -23,7 +23,7 @@ const {
   description = 'TallasseeTV — Menyajikan berita dan informasi terkini yang akurat dan terpercaya.',
   image = '/images/og-default.jpg',
   imageAlt = 'TallasseeTV',
-  url = Astro.url.href,
+  url, // Kept for backwards compatibility if passed explicitly
   canonicalUrl,
   type = 'website',
   publishedAt,
@@ -34,7 +34,14 @@ const {
   googleVerification,
 } = Astro.props;
 
-const canonical = canonicalUrl || url;
+// Use Astro.site to enforce the production domain avoiding Vercel localhost internal proxy leaks
+const baseUrl = import.meta.env.PUBLIC_SITE_URL || Astro.site?.href || 'https://www.tallasseetv.com';
+// Normalize baseUrl to not have a trailing slash, and pathname to have a leading slash
+const normalizedBase = baseUrl.replace(/\/$/, '');
+const normalizedPath = Astro.url.pathname.startsWith('/') ? Astro.url.pathname : `/${Astro.url.pathname}`;
+const safeUrl = `${normalizedBase}${normalizedPath}`;
+
+const canonical = canonicalUrl || url || safeUrl;
 const fullTitle = title.includes(siteName) ? title : `${title} — ${siteName}`;
 const absoluteImage = image.startsWith('http')
   ? image
