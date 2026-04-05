@@ -123,9 +123,8 @@ async function fetchAPI<T>(
     headers: {
       'Content-Type': 'application/json',
     },
-    // Cache for 60 seconds in production
-    // @ts-ignore
-    next: { revalidate: 60 },
+    // Ensure real-time updates by disabling cache
+    cache: 'no-store',
   });
 
   if (!res.ok) {
