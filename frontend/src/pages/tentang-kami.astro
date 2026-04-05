@@ -1,566 +1,366 @@
 ---
 import BaseLayout from '@/components/layout/BaseLayout.astro';
 
-const siteUrl =
-  import.meta.env.PUBLIC_SITE_URL || 'https://www.tallasseetv.com';
+const siteUrl = import.meta.env.PUBLIC_SITE_URL || 'https://www.tallasseetv.com';
 
 const breadcrumbs = [
   { name: 'Beranda', url: siteUrl },
   { name: 'Tentang Kami', url: `${siteUrl}/tentang-kami` },
 ];
 
-const team = [
+const philosophies = [
   {
-    name: 'Tim Redaksi TallasseeTV',
-    role: 'Redaktur Pelaksana',
-    bio: 'Tim redaksi kami terdiri dari jurnalis berpengalaman yang berdedikasi untuk menyajikan berita yang akurat dan berimbang.',
-    icon: '✍️',
+    title: 'Akurasi Tanpa Kompromi',
+    content: 'Informasi adalah pondasi kepercayaan. Setiap kata yang kami terbitkan melewati proses verifikasi ketat untuk memastikan kebenaran di atas segalanya.'
   },
   {
-    name: 'Divisi Teknologi',
-    role: 'Developer & IT Support',
-    bio: 'Memastikan platform kami berjalan dengan cepat, aman, dan mudah diakses oleh semua pembaca.',
-    icon: '💻',
+    title: 'Independensi Redaksi',
+    content: 'Suara TallasseeTV murni milik publik. Kami menjaga jarak yang aman dari kepentingan politik maupun komersial demi menjaga integritas jurnalisme.'
   },
   {
-    name: 'Divisi Multimedia',
-    role: 'Fotografer & Videografer',
-    bio: 'Mengabadikan setiap momen penting dalam bentuk visual berkualitas tinggi untuk melengkapi setiap berita.',
-    icon: '📸',
-  },
-];
-
-const values = [
-  {
-    icon: '🎯',
-    title: 'Akurasi',
-    desc: 'Setiap informasi diverifikasi dari sumber terpercaya sebelum dipublikasikan.',
-  },
-  {
-    icon: '⚖️',
-    title: 'Keberimbangan',
-    desc: 'Menyajikan setiap isu dari berbagai sudut pandang secara objektif dan adil.',
-  },
-  {
-    icon: '⚡',
-    title: 'Kecepatan',
-    desc: 'Berita terkini tersaji secepat mungkin tanpa mengorbankan akurasi informasi.',
-  },
-  {
-    icon: '🤝',
-    title: 'Integritas',
-    desc: 'Menjaga independensi redaksi dari pengaruh kepentingan apapun.',
-  },
-  {
-    icon: '🌐',
-    title: 'Aksesibilitas',
-    desc: 'Platform kami dirancang agar mudah diakses oleh semua kalangan masyarakat.',
-  },
-  {
-    icon: '🔒',
-    title: 'Privasi',
-    desc: 'Menghormati privasi seluruh pembaca dan narasumber kami.',
-  },
+    title: 'Literasi Digital',
+    content: 'Kami tidak hanya menyajikan berita, tapi juga membantu masyarakat memilah arus informasi di era digital yang semakin kompleks.'
+  }
 ];
 ---
 
 <BaseLayout
-  title='Tentang Kami'
-  description='Kenali TallasseeTV lebih dekat. Visi, misi, dan nilai-nilai yang kami pegang dalam menyajikan berita dan informasi terpercaya untuk masyarakat.'
-  type='website'
-  jsonLd={{ type: 'breadcrumb', data: {}, breadcrumbs }}>
-  <div class='container page-wrapper'>
-    <!-- Breadcrumb -->
-    <nav
-      class='breadcrumb'
-      aria-label='Breadcrumb'>
-      <ol role='list'>
-        <li><a href='/'>Beranda</a></li>
-        <li aria-hidden='true'>›</li>
-        <li><span aria-current='page'>Tentang Kami</span></li>
-      </ol>
-    </nav>
+  title="Tentang TallasseeTV"
+  description="Membangun ekosistem informasi yang cerdas, berimbang, dan berintegritas. Kenali filosofi editorial dan misi kami untuk masyarakat."
+  type="website"
+  jsonLd={{ type: 'breadcrumb', data: {}, breadcrumbs }}
+>
+  <div class="about-container">
+    <!-- Editorial Header Explorer -->
+    <header class="header-minimal animate-fade-in">
+      <nav class="breadcrumb-minimal" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="/">Beranda</a></li>
+          <li class="sep">/</li>
+          <li class="active">Tentang Kami</li>
+        </ol>
+      </nav>
+      <h1 class="editorial-title">Kepercayaan adalah <br/><span class="text-accent">Pondasi Jurnalistik.</span></h1>
+    </header>
 
-    <!-- Hero -->
-    <section
-      class='about-hero animate-fade-in-up'
-      aria-labelledby='about-heading'>
-      <div
-        class='about-hero-icon'
-        aria-hidden='true'>
-        📺
-      </div>
-      <h1
-        id='about-heading'
-        class='about-title'>
-        Tentang TallasseeTV
-      </h1>
-      <p class='about-subtitle'>
-        Media digital terpercaya yang hadir untuk masyarakat
-      </p>
-    </section>
-
-    <!-- Story -->
-    <section
-      class='content-section animate-fade-in-up animation-delay-100'
-      aria-labelledby='story-heading'>
-      <div class='content-grid'>
-        <div class='content-text'>
-          <h2
-            id='story-heading'
-            class='section-title'>
-            Kisah Kami
-          </h2>
-          <div class='prose'>
-            <p>
-              <strong>TallasseeTV</strong> hadir sebagai platform media digital yang
-              lahir dari semangat untuk menyajikan informasi yang akurat, berimbang,
-              dan mudah dipahami oleh semua kalangan masyarakat.
-            </p>
-            <p>
-              Kami percaya bahwa setiap orang berhak mendapatkan akses terhadap
-              informasi berkualitas tinggi tanpa harus terjebak dalam derasnya
-              arus hoaks dan disinformasi yang semakin marak di era digital ini.
-            </p>
-            <p>
-              Dengan tim jurnalis dan konten kreator yang berpengalaman, kami
-              berkomitmen untuk terus menghadirkan konten yang tidak hanya
-              informatif, tetapi juga mampu memberikan dampak positif bagi
-              kehidupan pembaca kami.
-            </p>
-          </div>
-        </div>
-        <div
-          class='content-stats'
-          aria-label='Statistik TallasseeTV'>
-          {
-            [
-              { num: '100+', label: 'Artikel Diterbitkan' },
-              { num: '10K+', label: 'Pembaca Setia' },
-              { num: '5+', label: 'Kategori Konten' },
-              { num: '24/7', label: 'Update Terbaru' },
-            ].map((stat) => (
-              <div class='stat-card'>
-                <span class='stat-num'>{stat.num}</span>
-                <span class='stat-label'>{stat.label}</span>
-              </div>
-            ))
-          }
-        </div>
-      </div>
-    </section>
-
-    <!-- Vision & Mission -->
-    <section
-      class='vm-section animate-fade-in-up animation-delay-200'
-      aria-labelledby='vm-heading'>
-      <h2
-        id='vm-heading'
-        class='section-title'>
-        Visi & Misi
-      </h2>
-      <div class='vm-grid'>
-        <div class='vm-card vm-card--vision'>
-          <div
-            class='vm-icon'
-            aria-hidden='true'>
-            🔭
-          </div>
-          <h3 class='vm-title'>Visi</h3>
-          <p class='vm-desc'>
-            Menjadi platform media digital terdepan di Indonesia yang menjadi
-            rujukan utama masyarakat dalam mendapatkan informasi yang akurat,
-            berimbang, dan bertanggung jawab.
+    <!-- Main Narrative Section -->
+    <section class="section-narrative animate-fade-in-up animation-delay-100">
+      <div class="narrative-grid">
+        <aside class="narrative-aside">
+          <p class="aside-eyebrow">TallasseeTV Story</p>
+          <h2 class="aside-title">Membangun Narasi yang Berintegritas.</h2>
+        </aside>
+        <div class="narrative-main prose-minimal">
+          <p>
+            <strong>TallasseeTV</strong> hadir sebagai respon atas kebutuhan masyarakat akan informasi yang tidak hanya cepat, tapi juga memiliki kedalaman dan akurasi. Di era di mana disinformasi menjadi tantangan nyata, kami berkomitmen menjadi oase yang menjernihkan setiap isu.
+          </p>
+          <p>
+            Kami percaya bahwa jurnalisme berkualitas adalah pilar demokrasi. Oleh karena itu, setiap konten yang kami susun—mulai dari analisis mendalam hingga berita terkini—dirancang untuk memberdayakan pembaca, bukan sekadar mengejar klik.
+          </p>
+          <p>
+            Dengan semangat independensi, tim kami bergerak untuk menjangkau suara-suara yang sering terlewatkan, menyajikan ragam sudut pandang secara adil, dan membangun komunitas pembaca yang kritis serta cerdas.
           </p>
         </div>
-        <div class='vm-card vm-card--mission'>
-          <div
-            class='vm-icon'
-            aria-hidden='true'>
-            🎯
+      </div>
+    </section>
+
+    <!-- Philosophy Section (Minimalist List) -->
+    <section class="section-philosophy animate-fade-in-up animation-delay-200">
+      <div class="philosophy-header">
+        <h2 class="section-label">Our Philosophy</h2>
+      </div>
+      <div class="philosophy-list">
+        {philosophies.map((item) => (
+          <div class="philosophy-item">
+            <h3 class="philosophy-title">{item.title}</h3>
+            <p class="philosophy-text">{item.content}</p>
           </div>
-          <h3 class='vm-title'>Misi</h3>
-          <ul class='vm-list'>
-            <li>
-              Menyajikan berita dan informasi yang akurat, cepat, dan mudah
-              dipahami
-            </li>
-            <li>
-              Mendukung literasi digital masyarakat melalui konten edukatif
-              berkualitas
-            </li>
-            <li>Membangun ekosistem media yang sehat dan bertanggung jawab</li>
-            <li>Memberikan ruang bagi suara masyarakat untuk didengar</li>
-          </ul>
+        ))}
+      </div>
+    </section>
+
+    <!-- Simplified Team Impact -->
+    <section class="section-impact animate-fade-in-up animation-delay-300">
+      <div class="impact-content">
+        <p class="impact-quote">
+          "Media bukan sekadar penyampai pesan, melainkan cermin dari keberanian kita mencari kebenaran."
+        </p>
+        <div class="impact-meta">
+          <span class="impact-author">TallasseeTV Editorial Team</span>
+          <span class="impact-line"></span>
         </div>
       </div>
     </section>
 
-    <!-- Values -->
-    <section
-      class='values-section animate-fade-in-up animation-delay-200'
-      aria-labelledby='values-heading'>
-      <h2
-        id='values-heading'
-        class='section-title'>
-        Nilai-Nilai Kami
-      </h2>
-      <div class='values-grid'>
-        {
-          values.map((v, i) => (
-            <div
-              class={`value-card animate-fade-in-up animation-delay-${((i % 3) + 1) * 100}`}>
-              <span
-                class='value-icon'
-                aria-hidden='true'>
-                {v.icon}
-              </span>
-              <h3 class='value-title'>{v.title}</h3>
-              <p class='value-desc'>{v.desc}</p>
-            </div>
-          ))
-        }
-      </div>
-    </section>
-
-    <!-- Team -->
-    <section
-      class='team-section animate-fade-in-up animation-delay-300'
-      aria-labelledby='team-heading'>
-      <h2
-        id='team-heading'
-        class='section-title'>
-        Tim Kami
-      </h2>
-      <div class='team-grid'>
-        {
-          team.map((member) => (
-            <div class='team-card'>
-              <div
-                class='team-icon'
-                aria-hidden='true'>
-                {member.icon}
-              </div>
-              <h3 class='team-name'>{member.name}</h3>
-              <span class='team-role'>{member.role}</span>
-              <p class='team-bio'>{member.bio}</p>
-            </div>
-          ))
-        }
-      </div>
-    </section>
-
-    <!-- CTA -->
-    <section class='about-cta animate-fade-in-up animation-delay-300'>
-      <h2 class='cta-title'>Bergabunglah dengan Komunitas Kami</h2>
-      <p class='cta-desc'>
-        Ikuti TallasseeTV dan jadilah bagian dari komunitas pembaca yang cerdas
-        dan kritis.
-      </p>
-      <div class='cta-btns'>
-        <a
-          href='/artikel'
-          class='btn btn-primary'
-          >Baca Artikel Terbaru</a
-        >
-        <a
-          href='/kontak'
-          class='btn btn-outline'
-          >Hubungi Kami</a
-        >
+    <!-- Clean Footer CTA -->
+    <section class="about-footer-cta animate-fade-in-up animation-delay-300">
+      <div class="cta-inner">
+        <h2 class="cta-heading">Mari Membangun Komunitas yang Cerdas.</h2>
+        <div class="cta-actions">
+          <a href="/artikel" class="link-editorial">Baca Berita Terbaru —</a>
+          <a href="/kontak" class="link-editorial">Hubungi Redaksi —</a>
+        </div>
       </div>
     </section>
   </div>
 </BaseLayout>
 
 <style>
-  .page-wrapper {
-    padding: 2.5rem 0 5rem;
+  :root {
+    --about-spacing-lg: 8rem;
+    --about-spacing-md: 5rem;
+    --about-spacing-sm: 2.5rem;
   }
 
-  .breadcrumb ol {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    list-style: none;
-    padding: 0;
-    margin: 0 0 2rem;
-    font-size: 0.875rem;
-  }
-  .breadcrumb a {
-    color: var(--color-text-tertiary);
-    text-decoration: none;
-  }
-  .breadcrumb a:hover {
-    color: var(--color-accent);
-  }
-  .breadcrumb span {
-    color: var(--color-text-secondary);
-    font-weight: 500;
+  .about-container {
+    padding-bottom: var(--about-spacing-lg);
+    background: var(--color-bg);
   }
 
-  /* Hero */
-  .about-hero {
-    text-align: center;
-    padding: 3rem 0 2.5rem;
-  }
-  .about-hero-icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-  }
-  .about-title {
-    font-size: clamp(2rem, 5vw, 3rem);
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    color: var(--color-text-primary);
-    margin-bottom: 0.75rem;
-  }
-  .about-subtitle {
-    font-size: 1.125rem;
-    color: var(--color-text-secondary);
-  }
-
-  /* Content section */
-  .content-section {
-    padding: 2rem 0;
-  }
-  .content-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 2.5rem;
-    align-items: start;
-  }
-  @media (min-width: 768px) {
-    .content-grid {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-
-  .content-stats {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-  }
-
-  .stat-card {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
-    padding: 1.5rem;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 0.375rem;
-  }
-
-  .stat-num {
-    font-size: 2rem;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    background: linear-gradient(
-      135deg,
-      var(--color-accent),
-      var(--color-accent-light)
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .stat-label {
-    font-size: 0.875rem;
-    color: var(--color-text-tertiary);
-    font-weight: 500;
-  }
-
-  /* Vision & Mission */
-  .vm-section {
-    padding: 2rem 0;
-  }
-  .vm-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-  @media (min-width: 768px) {
-    .vm-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  .vm-card {
-    padding: 2rem;
-    border-radius: var(--radius-xl);
-    border: 1px solid var(--color-border);
-  }
-  .vm-card--vision {
-    background: var(--color-accent-bg);
-  }
-  .vm-card--mission {
-    background: var(--color-bg-secondary);
-  }
-
-  .vm-icon {
-    font-size: 2rem;
-    margin-bottom: 0.75rem;
-  }
-  .vm-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--color-text-primary);
-    margin-bottom: 0.75rem;
-  }
-  .vm-desc {
-    color: var(--color-text-secondary);
-    line-height: 1.7;
-    margin: 0;
-  }
-  .vm-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.625rem;
-  }
-  .vm-list li {
+  /* Header Minimal */
+  .header-minimal {
+    padding-top: var(--about-spacing-md);
+    padding-bottom: var(--about-spacing-sm);
+    border-bottom: 1px solid var(--color-border-light);
+    margin-bottom: var(--about-spacing-md);
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
     padding-left: 1.5rem;
-    position: relative;
-    color: var(--color-text-secondary);
-    line-height: 1.6;
-    font-size: 0.9375rem;
-  }
-  .vm-list li::before {
-    content: '✓';
-    position: absolute;
-    left: 0;
-    color: var(--color-accent);
-    font-weight: 700;
+    padding-right: 1.5rem;
   }
 
-  /* Values */
-  .values-section {
-    padding: 2rem 0;
-  }
-  .values-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  @media (min-width: 640px) {
-    .values-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  @media (min-width: 1024px) {
-    .values-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  .value-card {
-    padding: 1.5rem;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
-    transition: all var(--timing);
-  }
-  .value-card:hover {
-    border-color: var(--color-accent);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-  }
-  .value-icon {
-    font-size: 1.75rem;
-    display: block;
-    margin-bottom: 0.75rem;
-  }
-  .value-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--color-text-primary);
-    margin-bottom: 0.5rem;
-  }
-  .value-desc {
-    font-size: 0.9rem;
-    color: var(--color-text-secondary);
-    line-height: 1.6;
-    margin: 0;
-  }
-
-  /* Team */
-  .team-section {
-    padding: 2rem 0;
-  }
-  .team-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
-  }
-  @media (min-width: 768px) {
-    .team-grid {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  .team-card {
-    padding: 1.75rem;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
-    text-align: center;
-  }
-  .team-icon {
-    font-size: 2.5rem;
-    display: block;
-    margin-bottom: 0.875rem;
-  }
-  .team-name {
-    font-size: 1.0625rem;
-    font-weight: 700;
-    color: var(--color-text-primary);
-    margin-bottom: 0.25rem;
-  }
-  .team-role {
-    font-size: 0.8125rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--color-accent);
-    display: block;
-    margin-bottom: 0.75rem;
-  }
-  .team-bio {
-    font-size: 0.9rem;
-    color: var(--color-text-secondary);
-    line-height: 1.65;
-    margin: 0;
-  }
-
-  /* CTA */
-  .about-cta {
-    text-align: center;
-    padding: 3rem 2rem;
-    background: var(--color-bg-secondary);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
-    margin-top: 3rem;
-  }
-  .cta-title {
-    font-size: 1.625rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    color: var(--color-text-primary);
-    margin-bottom: 0.625rem;
-  }
-  .cta-desc {
-    color: var(--color-text-secondary);
-    margin-bottom: 1.75rem;
-  }
-  .cta-btns {
+  .breadcrumb-minimal ol {
     display: flex;
     gap: 0.75rem;
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.5rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+  }
+
+  .breadcrumb-minimal a { color: var(--color-text-tertiary); text-decoration: none; transition: color 0.3s; }
+  .breadcrumb-minimal a:hover { color: var(--color-text-primary); }
+  .breadcrumb-minimal .active { color: var(--color-accent); }
+  .breadcrumb-minimal .sep { color: var(--color-border); }
+
+  .editorial-title {
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  .text-accent {
+    color: var(--color-accent);
+  }
+
+  /* Narrative Section */
+  .section-narrative {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    margin-bottom: var(--about-spacing-lg);
+  }
+
+  .narrative-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  @media (min-width: 1024px) {
+    .narrative-grid {
+      grid-template-columns: 350px 1fr;
+      gap: 6rem;
+    }
+  }
+
+  .aside-eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--color-text-tertiary);
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .aside-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--color-text-primary);
+  }
+
+  .prose-minimal p {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: var(--color-text-secondary);
+    margin-bottom: 2rem;
+  }
+
+  .prose-minimal strong {
+    color: var(--color-text-primary);
+    font-weight: 700;
+  }
+
+  /* Philosophy Section */
+  .section-philosophy {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--about-spacing-md) 1.5rem;
+    background: var(--color-bg-secondary);
+    border-radius: 2rem;
+    margin-bottom: var(--about-spacing-lg);
+  }
+
+  .section-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: var(--color-text-tertiary);
+    margin-bottom: 3rem;
+    text-align: center;
+  }
+
+  .philosophy-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  @media (min-width: 768px) {
+    .philosophy-list {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3rem;
+    }
+  }
+
+  .philosophy-item {
+    position: relative;
+  }
+
+  .philosophy-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: var(--color-text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .philosophy-title::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--color-accent);
+    display: block;
+  }
+
+  .philosophy-text {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+
+  /* Impact Quote */
+  .section-impact {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    margin-bottom: var(--about-spacing-lg);
+    text-align: center;
+  }
+
+  .impact-quote {
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-text-primary);
+    font-style: italic;
+    margin-bottom: 2rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .impact-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .impact-author {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .impact-line {
+    width: 60px;
+    height: 1px;
+    background: var(--color-border);
+  }
+
+  /* Footer CTA */
+  .about-footer-cta {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .cta-inner {
+    padding: 4rem 3rem;
+    background: var(--color-text-primary);
+    color: var(--color-bg);
+    border-radius: 2rem;
+    text-align: center;
+  }
+
+  .cta-heading {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    font-weight: 800;
+    margin-bottom: 2.5rem;
+    letter-spacing: -0.03em;
+  }
+
+  .cta-actions {
+    display: flex;
     justify-content: center;
+    gap: 2rem;
     flex-wrap: wrap;
+  }
+
+  .link-editorial {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-bg);
+    text-decoration: none;
+    transition: transform 0.3s;
+    display: block;
+  }
+
+  .link-editorial:hover {
+    transform: translateX(10px);
+    color: var(--color-accent-light);
+  }
+
+  @media (max-width: 640px) {
+    .cta-inner {
+      padding: 3rem 1.5rem;
+    }
   }
 </style>
