@@ -61,15 +61,24 @@ export const Articles: CollectionConfig = {
       // Published articles are public; drafts need auth
       if (req.user) return true
       
-      // Force visibility for "today" by adding a 24h buffer to account for UTC/GMT+7 transitions
-      const tomorrow = new Date()
-      tomorrow.setDate(tomorrow.getDate() + 1)
-      tomorrow.setHours(0, 0, 0, 0)
+      // Force visibility for "today" by computing the current date in WIB
+      const now = new Date()
+      // Adjust standard UTC time to WIB (UTC+7)
+      const offsetMs = 7 * 60 * 60 * 1000
+      const wibDate = new Date(now.getTime() + offsetMs)
+      
+      const wibYear = wibDate.getUTCFullYear()
+      const wibMonth = String(wibDate.getUTCMonth() + 1).padStart(2, '0')
+      const wibDay = String(wibDate.getUTCDate()).padStart(2, '0')
+      
+      // Payload saves 'dayOnly' dates as YYYY-MM-DDT12:00:00.000Z.
+      // By setting threshold to end of the current WIB day, articles scheduled for 'today' become valid.
+      const publishThreshold = `${wibYear}-${wibMonth}-${wibDay}T23:59:59.999Z`
 
       return {
         and: [
           { status: { equals: 'published' } },
-          { publishedAt: { less_than_equal: tomorrow.toISOString() } },
+          { publishedAt: { less_than_equal: publishThreshold } },
         ],
       }
     },
