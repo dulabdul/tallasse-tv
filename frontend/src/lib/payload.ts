@@ -123,8 +123,6 @@ async function fetchAPI<T>(
     headers: {
       'Content-Type': 'application/json',
     },
-    // Ensure real-time updates by disabling cache
-    cache: 'no-store',
   });
 
   if (!res.ok) {
@@ -141,14 +139,15 @@ export async function getArticles(opts: {
   limit?: number;
   categorySlug?: string;
   sort?: string;
+  depth?: number;
 } = {}): Promise<PaginatedResponse<Article>> {
-  const { page = 1, limit = 9, categorySlug, sort = '-publishedAt' } = opts;
+  const { page = 1, limit = 9, categorySlug, sort = '-publishedAt', depth = 1 } = opts;
 
   const params: Record<string, string | number | boolean> = {
     page,
     limit,
     sort,
-    depth: 2,
+    depth,
     'where[status][equals]': 'published',
   };
 

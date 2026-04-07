@@ -141,6 +141,26 @@ export const Articles: CollectionConfig = {
         return data
       },
     ],
+    afterChange: [
+      async ({ doc, previousDoc, operation }) => {
+        if (operation === 'update' || operation === 'create') {
+          // Picu Vercel Deploy otomatis apabila artikel ini diterbitkan (atau dimutasi saat sedang terbit)
+          if (doc.status === 'published' || previousDoc?.status === 'published') {
+            const hookUrl = process.env.VERCEL_DEPLOY_HOOK_URL;
+            if (hookUrl) {
+              try {
+                // Post mutasi kosong ke Deploy Hook Vercel untuk membangun ulang UI statis
+                fetch(hookUrl, { method: 'POST' }).catch((error) => {
+                  console.error('Failed to trigger Vercel deploy hook:', error);
+                });
+              } catch (e) {
+                console.error('Error initiating Vercel build trigger', e);
+              }
+            }
+          }
+        }
+      },
+    ],
   },
   versions: {
     drafts: {

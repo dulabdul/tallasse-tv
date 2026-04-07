@@ -13,7 +13,10 @@ if (totalPages <= 1) {
 
 function getPageUrl(page: number) {
   if (page === 1) return baseUrl;
-  return `${baseUrl}?halaman=${page}`;
+  
+  // Menghindari slash ganda jika baseUrl sudah memiliki trailing slash
+  const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  return `${cleanBase}/${page}`;
 }
 
 // Generate page numbers array with ellipsis (…)

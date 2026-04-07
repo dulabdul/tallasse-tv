@@ -1,18 +1,26 @@
 ---
+import type { GetStaticPaths } from 'astro';
+import type { Page } from 'astro';
+import type { Article } from '@/lib/payload';
+
 import BaseLayout from '@/components/layout/BaseLayout.astro';
 import ArticleCard from '@/components/article/ArticleCard.astro';
 import Pagination from '@/components/ui/Pagination.astro';
 import { getArticles, getCategories } from '@/lib/payload';
 
-const LIMIT = 9;
-const page = Number(Astro.url.searchParams.get('halaman') || '1');
+export const getStaticPaths = (async ({ paginate }) => {
+  // Menarik semua daftar artikel sekaligus untuk dihitung menjadi chunk halaman statis HTML
+  const articlesData = await getArticles({ limit: 1000, sort: '-publishedAt', depth: 1 });
+  return paginate(articlesData.docs, { pageSize: 9 });
+}) satisfies GetStaticPaths;
 
-const [articlesData, categories] = await Promise.all([
-  getArticles({ page, limit: LIMIT }),
-  getCategories(),
-]);
+const { page } = Astro.props as { page: Page<Article> };
+const articles = page.data;
+const totalPages = page.lastPage;
+const totalDocs = page.total;
+const currentPage = page.currentPage;
 
-const { docs: articles, totalPages, totalDocs } = articlesData;
+const categories = await getCategories();
 
 const breadcrumbs = [
   { name: 'Beranda', url: import.meta.env.PUBLIC_SITE_URL || 'https://www.tallasseetv.com' },
@@ -21,7 +29,7 @@ const breadcrumbs = [
 ---
 
 <BaseLayout
-  title={`Semua Artikel${page > 1 ? ` — Halaman ${page}` : ''}`}
+  title={`Semua Artikel${currentPage > 1 ? ` — Halaman ${currentPage}` : ''}`}
   description="Kumpulan artikel berita dan informasi terkini dari TallasseeTV. Temukan artikel terbaru seputar berbagai topik."
   type="website"
   jsonLd={{ type: 'breadcrumb', data: {}, breadcrumbs }}
@@ -86,7 +94,7 @@ const breadcrumbs = [
 
       <div class="mt-20">
         <Pagination
-          currentPage={page}
+          currentPage={currentPage}
           totalPages={totalPages}
           baseUrl="/artikel"
         />
