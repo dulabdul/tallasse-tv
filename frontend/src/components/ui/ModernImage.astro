@@ -43,35 +43,25 @@ if (media) {
   }
 }
 
-// Fitur bawaan Astro V5 untuk remote images: memindai dimensi secara otomatis 
-// jika metadata ukuran tidak dilampirkan oleh props/CMS
-const needsInfer = !targetWidth || !targetHeight;
+// SSG Safety Constraint: Do NOT use inferSize=true during SSG compilation as it will crash the build
+// if the remote image is unreachable or returns a 4xx HTTP response. Provide a generic fallback.
+if (!targetWidth || !targetHeight) {
+  targetWidth = 1200;
+  targetHeight = 800;
+}
 
 // Fallback Teks Aksesibilitas
 const finalAlt = alt || media?.alt || 'TallasseeTV Media';
 ---
 
-{needsInfer ? (
-  <Picture
-    src={targetSrc}
-    alt={finalAlt}
-    formats={['avif', 'webp']}
-    fallbackFormat="jpg"
-    class={className}
-    loading={loading}
-    decoding={decoding}
-    inferSize={true}
-  />
-) : (
-  <Picture
-    src={targetSrc}
-    alt={finalAlt}
-    width={targetWidth!}
-    height={targetHeight!}
-    formats={['avif', 'webp']}
-    fallbackFormat="jpg"
-    class={className}
-    loading={loading}
-    decoding={decoding}
-  />
-)}
+<Picture
+  src={targetSrc}
+  alt={finalAlt}
+  width={targetWidth}
+  height={targetHeight}
+  formats={['avif', 'webp']}
+  fallbackFormat="jpg"
+  class={className}
+  loading={loading}
+  decoding={decoding}
+/>
