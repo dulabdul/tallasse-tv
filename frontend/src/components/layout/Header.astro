@@ -476,9 +476,9 @@ const currentPath = Astro.url.pathname;
 
   .search-result-item {
     display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    padding: 1.25rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.25rem 1.75rem;
     background: var(--color-bg-secondary);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
@@ -487,53 +487,53 @@ const currentPath = Astro.url.pathname;
   }
 
   .search-result-item:hover {
-    transform: translateX(10px);
+    transform: translateX(8px);
     border-color: var(--color-accent);
     background: var(--color-bg);
-    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
-  }
-
-  .result-img-wrapper {
-    width: 80px;
-    height: 80px;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    flex-shrink: 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  }
-
-  .result-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    box-shadow: 0 8px 24px -8px rgba(0,0,0,0.08);
   }
 
   .result-info {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 0.5rem;
     min-width: 0;
   }
 
   .result-title {
-    font-size: 1.125rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: var(--color-text-primary);
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    line-height: 1.35;
+    transition: color 0.3s ease;
+  }
+
+  .search-result-item:hover .result-title {
+    color: var(--color-accent);
+  }
+
+  .result-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .result-category {
+    color: var(--color-accent);
+    background: var(--color-accent-bg);
+    padding: 0.15rem 0.5rem;
+    border-radius: var(--radius-sm);
   }
 
   .result-date {
-    font-size: 0.8125rem;
-    font-weight: 500;
-    color: var(--color-text-tertiary);
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
   }
 
   .no-results {
@@ -567,15 +567,13 @@ const currentPath = Astro.url.pathname;
       font-size: 1.25rem;
     }
     .search-result-item {
-      padding: 1rem;
-      gap: 1rem;
-    }
-    .result-img-wrapper {
-      width: 60px;
-      height: 60px;
+      padding: 1rem 1.25rem;
     }
     .result-title {
-      font-size: 1rem;
+      font-size: 1.125rem;
+    }
+    .result-meta {
+      font-size: 0.6875rem;
     }
   }
 </style>
@@ -704,15 +702,15 @@ const currentPath = Astro.url.pathname;
             if (searchStatus) searchStatus.textContent = `${data.results.length} hasil ditemukan untuk "${query}"`;
             searchResults.innerHTML = data.results.map((item: any) => `
               <a href="/artikel/${item.slug}" class="search-result-item">
-                <div class="result-img-wrapper">
-                  <img src="${item.imageUrl}" alt="${item.title}" class="result-img" loading="lazy" />
-                </div>
                 <div class="result-info">
-                  <span class="result-title">${item.title}</span>
-                  <div class="result-date">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                    <span>${new Date(item.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                  <div class="result-meta">
+                    <span class="result-category">${item.category || 'Berita'}</span>
+                    <div class="result-date">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                      <span>${new Date(item.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                    </div>
                   </div>
+                  <span class="result-title">${item.title}</span>
                 </div>
               </a>
             `).join('');

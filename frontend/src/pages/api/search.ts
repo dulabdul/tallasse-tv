@@ -3,9 +3,6 @@ import sql from '@/lib/db';
 
 export const prerender = false;
 
-// Media URL construction logic (Direct from S3)
-const S3_BASE_URL = import.meta.env.NEXT_PUBLIC_S3_URL || 'https://cpyozwqiusuvgdluudgn.supabase.co/storage/v1/object/public/tallasseetv-media';
-
 export const GET: APIRoute = async ({ url }) => {
   const query = url.searchParams.get('q')?.trim();
   
@@ -18,22 +15,27 @@ export const GET: APIRoute = async ({ url }) => {
 
   try {
     const startTime = Date.now();
-    console.log(`\x1b[35m[Direct Search]\x1b[0m Executing SQL FTS for: "${query}"`);
+    console.log(`\x1b[35m[Performance Search]\x1b[0m Query: "${query}"`);
 
     /**
-     * ADVANCED POSTGRES SEARCH STRATEGY:
-     * 1. Primary: Full-Text Search (FTS) with Vector Ranking
-     * 2. Select only required fields for speed
-     * 3. Join with media table to get filename in one go
+     * OPTIMIZED SQL FOR SPEED (Text-Only):
+     * 1. Remove Media JOIN to eliminate large binary metadata overhead.
+     * 2. Efficiently pull primary category via correlated subquery.
+     * 3. Select only strictly necessary string fields.
      */
     let results = await sql`
       SELECT 
         a.title, 
         a.slug, 
-        a.published_at as date, 
-        m.filename
+        a.published_at as date,
+        (
+          SELECT c.name 
+          FROM categories c
+          JOIN articles_rels ar ON ar.categories_id = c.id
+          WHERE ar.parent_id = a.id AND ar.path = 'categories'
+          LIMIT 1
+        ) as category
       FROM articles a
-      LEFT JOIN media m ON a.featured_image_id = m.id
       WHERE a.status = 'published'
         AND to_tsvector('simple', a.title) @@ plainto_tsquery('simple', ${query})
       ORDER BY 
@@ -42,17 +44,22 @@ export const GET: APIRoute = async ({ url }) => {
       LIMIT 8
     `;
 
-    // FALLBACK: If FTS returns 0, try lightweight ILIKE for partial word fragments
+    // FALLBACK: Lightweight ILIKE if FTS fails
     if (results.length === 0) {
-      console.log(`\x1b[33m[Search Fallback]\x1b[0m FTS yielded 0, trying ILIKE...`);
+      console.log(`\x1b[33m[Search Fallback]\x1b[0m No FTS results, trying ILIKE...`);
       results = await sql`
         SELECT 
           a.title, 
           a.slug, 
-          a.published_at as date, 
-          m.filename
+          a.published_at as date,
+          (
+            SELECT c.name 
+            FROM categories c
+            JOIN articles_rels ar ON ar.categories_id = c.id
+            WHERE ar.parent_id = a.id AND ar.path = 'categories'
+            LIMIT 1
+          ) as category
         FROM articles a
-        LEFT JOIN media m ON a.featured_image_id = m.id
         WHERE a.status = 'published'
           AND a.title ILIKE ${'%' + query + '%'}
         ORDER BY a.published_at DESC
@@ -61,24 +68,13 @@ export const GET: APIRoute = async ({ url }) => {
     }
 
     const duration = Date.now() - startTime;
-    console.log(`\x1b[32m[Search Success]\x1b[0m Found ${results.length} results in ${duration}ms`);
+    console.log(`\x1b[32m[Search Success]\x1b[0m JSON Response generated in ${duration}ms`);
 
-    // Map DB results to Frontend Contract
-    const formattedResults = results.map(row => ({
-      title: row.title,
-      slug: row.slug,
-      date: row.date,
-      // Construct URL directly bypassing CMS helper for speed
-      imageUrl: row.filename 
-        ? `${S3_BASE_URL}/${row.filename}`
-        : '/images/placeholder.jpg'
-    }));
-
-    return new Response(JSON.stringify({ results: formattedResults }), {
+    return new Response(JSON.stringify({ results }), {
       status: 200,
       headers: { 
         'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=30, stale-while-revalidate=60'
+        'Cache-Control': 'public, max-age=60, stale-while-revalidate=120'
       }
     });
 
