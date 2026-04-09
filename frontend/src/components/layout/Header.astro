@@ -71,6 +71,51 @@ const currentPath = Astro.url.pathname;
 
     <!-- Actions -->
     <div class="header-actions">
+      <!-- Search -->
+      <div class="search-container" id="search-container">
+        <button
+          id="search-toggle"
+          class="icon-btn"
+          aria-label="Buka pencarian"
+          title="Cari artikel"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
+
+        <div id="search-modal" class="search-overlay hidden">
+          <div class="search-overlay-content">
+            <div class="search-field-container">
+              <svg class="search-field-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input
+                type="text"
+                id="search-input"
+                class="search-field-input"
+                placeholder="Apa yang ingin Anda baca hari ini?"
+                autocomplete="off"
+              />
+              <button id="search-close" class="search-overlay-close" aria-label="Tutup pencarian">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            
+            <div id="search-results-wrapper" class="search-results-wrapper">
+              <div class="search-results-header">
+                <span id="search-status" class="search-status">Ketik minimal 2 karakter untuk mencari...</span>
+              </div>
+              <div id="search-results" class="search-results-list">
+                <!-- Results populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Theme Toggle -->
       <button
         id="theme-toggle"
@@ -254,7 +299,7 @@ const currentPath = Astro.url.pathname;
   }
 
   .hidden {
-    display: none;
+    display: none !important;
   }
 
   /* Mobile */
@@ -301,6 +346,236 @@ const currentPath = Astro.url.pathname;
     }
     .mobile-only {
       display: flex;
+    }
+  }
+
+  /* Search Styles - Full Screen Overlay */
+  .search-container {
+    position: static; /* Let the overlay be relative to viewport */
+  }
+
+  .search-overlay {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background: color-mix(in srgb, var(--color-bg) 92%, transparent);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    animation: fadeInOverlay 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .search-overlay-content {
+    max-width: 800px;
+    margin: 4rem auto 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .search-field-container {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid var(--color-border);
+    transition: border-color 0.3s ease;
+  }
+
+  .search-field-container:focus-within {
+    border-bottom-color: var(--color-accent);
+  }
+
+  .search-field-icon {
+    color: var(--color-text-tertiary);
+    flex-shrink: 0;
+  }
+
+  .search-field-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    width: 100%;
+  }
+
+  .search-field-input::placeholder {
+    color: var(--color-text-tertiary);
+    opacity: 0.5;
+  }
+
+  .search-overlay-close {
+    background: var(--color-bg-tertiary);
+    border: none;
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--timing);
+  }
+
+  .search-overlay-close:hover {
+    background: var(--color-border);
+    color: var(--color-text-primary);
+    transform: rotate(90deg);
+  }
+
+  .search-results-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-height: 0;
+  }
+
+  .search-results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .search-status {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .search-results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    max-height: 60vh;
+  }
+
+  /* Custom Scrollbar for results */
+  .search-results-list::-webkit-scrollbar {
+    width: 6px;
+  }
+  .search-results-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .search-results-list::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 10px;
+  }
+
+  .search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.25rem;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .search-result-item:hover {
+    transform: translateX(10px);
+    border-color: var(--color-accent);
+    background: var(--color-bg);
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+  }
+
+  .result-img-wrapper {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  .result-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .result-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  .result-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .result-date {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-text-tertiary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .no-results {
+    padding: 4rem 2rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    color: var(--color-text-tertiary);
+  }
+
+  .no-results-icon {
+    font-size: 3rem;
+  }
+
+  @keyframes fadeInOverlay {
+    from { opacity: 0; transform: scale(1.02); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @media (max-width: 768px) {
+    .search-overlay {
+      padding: 1.5rem 1rem;
+    }
+    .search-overlay-content {
+      margin-top: 2rem;
+      gap: 2rem;
+    }
+    .search-field-input {
+      font-size: 1.25rem;
+    }
+    .search-result-item {
+      padding: 1rem;
+      gap: 1rem;
+    }
+    .result-img-wrapper {
+      width: 60px;
+      height: 60px;
+    }
+    .result-title {
+      font-size: 1rem;
     }
   }
 </style>
@@ -357,4 +632,105 @@ const currentPath = Astro.url.pathname;
   window.addEventListener('scroll', () => {
     header?.classList.toggle('scrolled', window.scrollY > 10);
   }, { passive: true });
+
+  // ── Search Logic ──────────────────────────────────────────
+  const searchToggle = document.getElementById('search-toggle');
+  const searchModal = document.getElementById('search-modal');
+  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+  const searchClose = document.getElementById('search-close');
+  const searchResults = document.getElementById('search-results');
+  const searchStatus = document.getElementById('search-status');
+  const searchContent = document.querySelector('.search-overlay-content');
+  const body = document.body;
+  let searchTimeout: any;
+
+  function toggleSearch(show: boolean) {
+    if (show) {
+      searchModal?.classList.remove('hidden');
+      body.style.overflow = 'hidden'; 
+      setTimeout(() => searchInput?.focus(), 100);
+    } else {
+      searchModal?.classList.add('hidden');
+      body.style.overflow = '';
+      if (searchInput) searchInput.value = '';
+      if (searchResults) searchResults.innerHTML = '';
+      if (searchStatus) searchStatus.textContent = 'Ketik minimal 2 karakter untuk mencari...';
+    }
+  }
+
+  searchToggle?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleSearch(true);
+  });
+  
+  searchClose?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleSearch(false);
+  });
+
+  // Close on backdrop click (outside the content area)
+  searchModal?.addEventListener('click', (e) => {
+    if (searchContent && !searchContent.contains(e.target as Node)) {
+      toggleSearch(false);
+    }
+  });
+
+  // ESC key to close
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !searchModal?.classList.contains('hidden')) {
+      toggleSearch(false);
+    }
+  });
+
+  searchInput?.addEventListener('input', (e) => {
+    const query = (e.target as HTMLInputElement).value.trim();
+    
+    clearTimeout(searchTimeout);
+    if (query.length < 2) {
+      if (searchResults) searchResults.innerHTML = '';
+      if (searchStatus) searchStatus.textContent = 'Ketik minimal 2 karakter untuk mencari...';
+      return;
+    }
+
+    if (searchStatus) searchStatus.textContent = `Mencari "${query}"...`;
+
+    searchTimeout = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        
+        if (searchResults) {
+          if (data.results && data.results.length > 0) {
+            if (searchStatus) searchStatus.textContent = `${data.results.length} hasil ditemukan untuk "${query}"`;
+            searchResults.innerHTML = data.results.map((item: any) => `
+              <a href="/artikel/${item.slug}" class="search-result-item">
+                <div class="result-img-wrapper">
+                  <img src="${item.imageUrl}" alt="${item.title}" class="result-img" loading="lazy" />
+                </div>
+                <div class="result-info">
+                  <span class="result-title">${item.title}</span>
+                  <div class="result-date">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <span>${new Date(item.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                  </div>
+                </div>
+              </a>
+            `).join('');
+          } else {
+            if (searchStatus) searchStatus.textContent = 'Tidak ada hasil';
+            searchResults.innerHTML = `
+              <div class="no-results">
+                <span class="no-results-icon">🔍</span>
+                <p>Maaf, kami tidak dapat menemukan artikel dengan kata kunci <strong>"${query}"</strong>.</p>
+                <p style="font-size: 0.875rem; color: var(--color-text-tertiary)">Coba gunakan kata kunci lain.</p>
+              </div>
+            `;
+          }
+        }
+      } catch (err) {
+        console.error('Search failed:', err);
+        if (searchStatus) searchStatus.textContent = 'Gagal memuat hasil';
+      }
+    }, 400); 
+  });
 </script>

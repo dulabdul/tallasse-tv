@@ -2,13 +2,9 @@
 import BaseLayout from '@/components/layout/BaseLayout.astro';
 import SocialShare from '@/components/ui/SocialShare.astro';
 import ModernImage from '@/components/ui/ModernImage.astro';
-import {
-  getArticleBySlug,
-  getAllArticleSlugs,
-  getMediaUrl,
-  getSiteSettings,
-} from '@/lib/payload';
-import { blocksToHtml, formatDate, truncate } from '@/lib/utils';
+import { getArticleBySlug, getAllArticleSlugs, getMediaUrl, getSiteSettings } from '@/lib/payload';
+import { blocksToHtml, formatDate, truncate, extractHeadings } from '@/lib/utils';
+import TOC from '@/components/article/TOC.astro';
 
 // ── Static Path Generation ─────────────────────────────────────────────────────
 export async function getStaticPaths() {
@@ -44,6 +40,9 @@ const publishDate = article.publishedAt || article.createdAt;
 
 // Rich text → HTML
 const contentHtml = blocksToHtml(article.content);
+
+// Extract headings for TOC
+const headings = extractHeadings(article.content);
 ---
 
 <BaseLayout
@@ -104,11 +103,27 @@ const contentHtml = blocksToHtml(article.content);
       </div>
     </div>
 
-    <!-- Content -->
-    <div class='article-content-section'>
-      <div class='container--narrow'>
-        <div class='prose'>
-          <Fragment set:html={contentHtml} />
+    <!-- Content & Sidebar Section -->
+    <div class='article-main-grid'>
+      <div class='container--wide'>
+        <div class='grid-layout'>
+          <!-- ToC - Mobile Only -->
+          <div class="toc-mobile-wrapper">
+            <TOC headings={headings} />
+          </div>
+
+          <div class='article-body'>
+            <div class='prose'>
+              <Fragment set:html={contentHtml} />
+            </div>
+          </div>
+
+          <!-- Sidebar - Desktop Only -->
+          <aside class='article-sidebar'>
+            <div class='sidebar-sticky'>
+              <TOC headings={headings} />
+            </div>
+          </aside>
         </div>
       </div>
     </div>
@@ -224,9 +239,58 @@ const contentHtml = blocksToHtml(article.content);
     margin: 0 0.5rem;
   }
 
-  /* Content */
-  .article-content-section {
+  /* Content & Grid Layout */
+  .article-main-grid {
     margin-bottom: 6rem;
+  }
+
+  .grid-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .toc-mobile-wrapper {
+    display: block;
+    max-width: 850px;
+    margin: 0 auto;
+  }
+
+  .article-body {
+    max-width: 850px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .article-sidebar {
+    display: none;
+  }
+
+  @media (min-width: 1100px) {
+    .grid-layout {
+      grid-template-columns: 1fr 320px;
+      align-items: flex-start;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .article-body {
+      margin: 0;
+      max-width: none;
+    }
+
+    .toc-mobile-wrapper {
+      display: none;
+    }
+
+    .article-sidebar {
+      display: block;
+    }
+
+    .sidebar-sticky {
+      position: sticky;
+      top: calc(var(--nav-height) + 2rem);
+    }
   }
 
   /* Footer */
@@ -251,13 +315,41 @@ const contentHtml = blocksToHtml(article.content);
   .prose {
     font-size: 1.125rem;
     line-height: 1.8;
-    color: #333;
   }
 
-  /* Fix for images inside article content if they exist */
+  [data-theme="light"] .prose {
+    color: #334155;
+  }
+
+  [data-theme="dark"] .prose {
+    color: #cbd5e1;
+  }
+
+  /* Prose Headings */
+  .prose :global(h2) {
+    font-size: 1.875rem;
+    font-weight: 800;
+    margin: 3rem 0 1.5rem;
+    scroll-margin-top: calc(var(--nav-height) + 2rem);
+    color: var(--color-text-primary);
+  }
+
+  .prose :global(h3) {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 2.5rem 0 1rem;
+    scroll-margin-top: calc(var(--nav-height) + 2rem);
+    color: var(--color-text-primary);
+  }
+
+  /* Fix for images inside article content */
+  .prose :global(figure) {
+    margin: 3rem 0;
+  }
+
   .prose :global(img) {
-    max-width: 100%;
+    border-radius: var(--radius-lg);
+    width: 100%;
     height: auto;
-    margin: 2.5rem 0;
   }
 </style>
